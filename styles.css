@@ -195,6 +195,16 @@ tbody tr:nth-child(even) { background: var(--surface-2); }
   content: "›"; position: absolute; right: -6px; top: -12px; color: var(--coral); font-weight: 800; font-size: 18px;
 }
 
+/* diagram figure (손그림 도판) */
+.diagram-figure { margin: 18px 0 8px; text-align: center; }
+.diagram-figure img {
+  max-width: 440px; width: 100%; border-radius: 14px;
+  border: 1px solid var(--line); box-shadow: var(--shadow); background: #fff;
+}
+.diagram-figure figcaption {
+  margin-top: 10px; font-size: 13px; color: var(--ink-soft); font-weight: 600;
+}
+
 /* role grid + cards */
 .role-grid, .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
 .role-grid > div, .mini-card {
