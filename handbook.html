@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Agent 완전 활용 핸드북</title>
+<style>
+:root{
+  --bg:#eef4f2; --paper:#fbfdfc; --surface:#ffffff;
+  --ink:#12263a; --ink-2:#344e63; --muted:#6d8192;
+  --navy:#173a5d; --navy-2:#0f2a45;
+  --teal:#089aa2; --teal-deep:#066c72; --teal-soft:#e1f3f3;
+  --coral:#ef674f; --coral-soft:#fdebe6;
+  --amber:#c98712; --amber-soft:#fbf0d9;
+  --green:#17996a; --green-soft:#e0f2e9;
+  --blue:#315f9f; --blue-soft:#e6edf7;
+  --line:#d9e5e2; --line-2:#c2d2cf;
+  --code-bg:#102234; --code-ink:#d9e8eb;
+  --shadow:0 1px 2px rgba(18,38,58,.04),0 12px 28px -18px rgba(18,38,58,.28);
+  --shadow-lg:0 2px 8px rgba(18,38,58,.06),0 24px 52px -28px rgba(18,38,58,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+  line-height:1.68; color:var(--ink); -webkit-font-smoothing:antialiased;
+  position:relative;
+  background:
+    linear-gradient(135deg,rgba(8,154,162,.08) 0 1px,transparent 1px 52px),
+    linear-gradient(45deg,rgba(239,103,79,.06) 0 1px,transparent 1px 64px),
+    var(--bg);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(251,253,252,.62),rgba(238,244,242,.2) 36%,rgba(238,244,242,.82));
+}
+code,.kbd,.badge,.lbl,.reset,.copy,.kicker,.section-label{
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 22px 100px;position:relative;z-index:1}
+
+/* Topbar */
+.topbar{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(217,229,226,.5);z-index:50}
+.topfill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--green));
+  box-shadow:0 0 10px rgba(8,154,162,.6);transition:width .4s ease}
+
+/* Header */
+header{padding:64px 0 30px;position:relative}
+header::before{
+  content:"";position:absolute;right:0;top:70px;width:118px;height:118px;z-index:-1;opacity:.16;
+  background:
+    linear-gradient(90deg,var(--teal) 0 18px,transparent 18px 32px,var(--coral) 32px 50px,transparent 50px),
+    linear-gradient(0deg,var(--navy) 0 18px,transparent 18px 32px,var(--teal) 32px 50px,transparent 50px);
+  background-size:50px 50px;
+  clip-path:polygon(32% 0,100% 0,100% 68%,68% 100%,0 100%,0 32%);
+}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--teal-deep);
+  background:var(--teal-soft);padding:7px 14px;border-radius:999px}
+.kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);
+  box-shadow:0 0 0 5px rgba(8,154,162,.18)}
+h1{font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-.02em;line-height:1.08;
+  margin:22px 0 18px}
+h1 .hl{position:relative;white-space:nowrap}
+h1 .hl::after{content:"";position:absolute;left:-3px;right:-3px;bottom:7px;height:28%;
+  background:rgba(239,103,79,.22);border-radius:4px;z-index:-1}
+.lede{font-size:18px;font-weight:350;color:var(--ink-2);max-width:680px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);
+  background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 13px}
+.miniicon{width:9px;height:9px;border-radius:3px;background:var(--teal)}
+.miniicon.coral{background:var(--coral)} .miniicon.amber{background:var(--amber)}
+.miniicon.green{background:var(--green)} .miniicon.blue{background:var(--blue)}
+
+/* Proof grid */
+.proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.proof{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 16px;box-shadow:var(--shadow)}
+.proof.dark{background:linear-gradient(150deg,var(--navy),var(--navy-2));border:none;color:#fff}
+.proof .big{font-size:38px;font-weight:800;color:var(--coral);line-height:1;letter-spacing:-.02em}
+.proof.dark .big{color:#fff}
+.proof .cap{font-size:13px;color:var(--muted);margin-top:8px}
+.proof.dark .cap{color:rgba(255,255,255,.66)}
+.proof em{font-style:normal;color:var(--teal)}
+.proof.dark em{color:#7fe0e3}
+
+/* Progress card */
+.progress-card{display:flex;align-items:center;gap:20px;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:22px 0;box-shadow:var(--shadow)}
+.ring{width:64px;height:64px;flex-shrink:0}
+.ring circle{fill:none;stroke-width:6}
+.ring .bg{stroke:var(--line)}
+.ring .fg{stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset .45s ease;
+  transform:rotate(-90deg);transform-origin:50% 50%}
+.progress-meta{flex:1}
+.progress-meta .pct{font-size:24px;font-weight:800;color:var(--ink)}
+.progress-meta .ptext{font-size:14px;color:var(--muted)}
+.reset{margin-left:auto;font-size:12px;color:var(--muted);background:var(--paper);
+  border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;transition:.2s}
+.reset:hover{color:var(--coral);border-color:var(--coral)}
+
+/* Section label */
+.section-label{font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);margin:50px 0 14px}
+
+/* Panel */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:24px 26px;margin-top:18px;box-shadow:var(--shadow)}
+.panel h2,.panel h3{font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
+.panel h3{font-size:18px}
+.panel p{font-size:15.5px;color:var(--ink-2);margin:10px 0}
+.panel p+p{margin-top:8px}
+.panel ul{margin:10px 0 10px 4px;list-style:none}
+.panel ul li{font-size:14.8px;color:var(--ink-2);padding-left:20px;position:relative;margin:7px 0}
+.panel ul li::before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;
+  border-radius:2px;background:var(--teal)}
+.panel strong{color:var(--ink);font-weight:700}
+.panel em{font-style:normal;background:var(--teal-soft);color:var(--teal-deep);
+  padding:1px 6px;border-radius:5px;font-size:.94em}
+
+/* Timeline + step */
+.timeline{position:relative;padding-left:54px;margin-top:8px}
+.timeline::before{content:"";position:absolute;left:21px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.step{position:relative;margin-bottom:18px;opacity:0;transform:translateY(14px);
+  animation:rise .55s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.node{position:absolute;left:-54px;top:0;width:44px;height:44px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--line);display:flex;align-items:center;
+  justify-content:center;z-index:2;transition:.3s}
+.node .num{font-size:16px;font-weight:800;color:var(--teal-deep)}
+.node .check{display:none;color:#fff;font-size:18px;font-weight:800}
+.step.done .node{background:var(--green);border-color:var(--green)}
+.step.done .node .num{display:none}
+.step.done .node .check{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:22px 24px;box-shadow:var(--shadow);
+  transition:transform .25s ease,box-shadow .25s ease,opacity .25s ease}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.ctitle{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cdesc{font-size:15.5px;color:var(--ink-2);margin:10px 0}
+.cdesc strong{color:var(--ink)}
+.cdesc em{font-style:normal;background:var(--teal-soft);color:var(--teal-deep);padding:1px 6px;border-radius:5px;font-size:.94em}
+
+/* Badge */
+.badge{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:6px;background:var(--teal-soft);color:var(--teal-deep)}
+.badge.coral{background:var(--coral-soft);color:var(--coral)}
+.badge.amber{background:var(--amber-soft);color:var(--amber)}
+.badge.green{background:var(--green-soft);color:var(--green)}
+.badge.blue{background:var(--blue-soft);color:var(--blue)}
+
+/* Code block */
+.code{background:var(--code-bg);border-radius:12px;overflow:hidden;margin:14px 0;position:relative}
+.code .head{display:flex;align-items:center;gap:7px;padding:11px 14px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.code .tl{width:11px;height:11px;border-radius:50%}
+.code .tl.r{background:#ff5f56} .code .tl.y{background:#ffbd2e} .code .tl.g{background:#27c93f}
+.code .lbl{font-size:12px;color:rgba(217,232,235,.6);margin-left:8px}
+.code .copy{position:absolute;top:9px;right:12px;font-size:11px;color:var(--code-ink);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:6px;
+  padding:5px 11px;cursor:pointer;transition:.2s}
+.code .copy:hover{background:rgba(8,154,162,.3)}
+.code .copy.copied{background:var(--green);border-color:var(--green)}
+.code pre{padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.75;color:var(--code-ink);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+.code pre .pr{color:#7fe0e3;user-select:none}
+.code pre .cm{color:#6d8192}
+
+/* Notes */
+.note{display:flex;gap:13px;padding:14px 16px;border-radius:10px;margin:14px 0;font-size:14.4px;line-height:1.62}
+.note .mark{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:1px}
+.note b{font-weight:700}
+.note.warn{background:var(--coral-soft)} .note.warn .mark{background:var(--coral)} .note.warn b{color:var(--coral)}
+.note.info{background:var(--teal-soft)} .note.info .mark{background:var(--teal)} .note.info b{color:var(--teal-deep)}
+.note.tip{background:var(--amber-soft)} .note.tip .mark{background:var(--amber)} .note.tip b{color:var(--amber)}
+.note div{color:var(--ink-2)}
+.note code{background:rgba(18,38,58,.08);padding:1px 6px;border-radius:5px;font-size:12.8px;color:var(--ink)}
+
+/* Matrix */
+.matrix{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.3px}
+.matrix th{text-align:left;font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 12px;
+  border-bottom:2px solid var(--line-2)}
+.matrix td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top}
+.matrix tr:last-child td{border-bottom:none}
+.matrix td code{background:var(--teal-soft);color:var(--teal-deep);padding:2px 7px;border-radius:6px;
+  font-size:12.5px;white-space:nowrap}
+.matrix td strong{color:var(--ink)}
+.matrix .ok{color:var(--green);font-weight:700} .matrix .no{color:var(--coral);font-weight:700}
+.matrix .mid{color:var(--amber);font-weight:700}
+
+/* donebtn */
+.donebtn{display:inline-flex;align-items:center;gap:10px;margin-top:14px;font-size:13.5px;
+  font-weight:600;color:var(--ink-2);background:var(--paper);border:1.5px dashed var(--line-2);
+  border-radius:10px;padding:9px 16px;cursor:pointer;transition:.25s;font-family:inherit}
+.donebtn:hover{border-color:var(--teal);color:var(--teal-deep)}
+.donebtn .box{width:20px;height:20px;border:1.5px solid var(--line-2);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;transition:.25s}
+.donebtn .box svg{width:13px;height:13px;opacity:0;transition:.2s;stroke:#fff}
+.step.done .donebtn{border-style:solid;border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.step.done .donebtn .box{background:var(--green);border-color:var(--green)}
+.step.done .donebtn .box svg{opacity:1}
+.step.done .donebtn .t::after{content:" 완료";font-weight:700}
+.step.done .donebtn .t{font-weight:700}
+
+/* Checklist */
+.checklist{margin-top:8px}
+.checklist .grp{font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--teal-deep);margin:18px 0 8px}
+.chk{display:flex;align-items:flex-start;gap:11px;padding:9px 0;cursor:pointer;font-size:14.5px;color:var(--ink-2)}
+.chk .tick{width:20px;height:20px;border:1.5px solid var(--line-2);border-radius:6px;flex-shrink:0;
+  margin-top:2px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.chk .tick svg{width:13px;height:13px;opacity:0;stroke:#fff;transition:.2s}
+.chk.done .tick{background:var(--teal);border-color:var(--teal)}
+.chk.done .tick svg{opacity:1}
+.chk.done .lab{text-decoration:line-through;color:var(--muted)}
+
+/* completion banner */
+.banner{display:none;align-items:center;gap:14px;background:linear-gradient(120deg,var(--green-soft),var(--teal-soft));
+  border:1px solid var(--green);border-radius:14px;padding:20px 24px;margin:24px 0}
+.banner.show{display:flex;animation:rise .5s ease forwards}
+.banner .em{font-size:30px}
+.banner b{color:var(--green);font-size:16px}
+.banner p{font-size:14px;color:var(--ink-2);margin-top:2px}
+
+/* architecture grid */
+.arch{display:grid;grid-template-columns:1fr;gap:12px;margin:14px 0}
+.arch .col{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.arch .col h4{font-size:14px;color:var(--teal-deep);font-family:ui-monospace,monospace;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.arch .col p{font-size:14px;color:var(--ink-2);margin:4px 0}
+
+/* footer */
+footer{margin-top:60px;padding-top:28px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center}
+footer b{color:var(--ink-2)}
+.proof span.cite{font-size:13px}
+
+/* ToTop */
+.totop{position:fixed;bottom:26px;right:26px;width:46px;height:46px;border-radius:12px;
+  background:var(--navy);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;box-shadow:var(--shadow-lg);z-index:40}
+.totop.show{opacity:1;pointer-events:auto}
+.totop:hover{transform:translateY(-3px)}
+.totop svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.4}
+
+/* responsive */
+@media(max-width:760px){
+  .wrap{padding:0 16px 84px}
+  .proof-grid{grid-template-columns:1fr 1fr}
+  .timeline{padding-left:45px}
+  .timeline::before{left:18px}
+  .node{left:-45px;width:38px;height:38px}
+  .matrix{font-size:13px} .matrix th,.matrix td{padding:8px 8px}
+  .matrix td code{white-space:normal}
+  h1{margin-top:16px}
+}
+@media(max-width:460px){
+  .proof-grid{grid-template-columns:1fr}
+  .progress-card{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<style>
+.hubnav{position:sticky;top:0;z-index:99999;background:#0f2330;color:#f5f7f6;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.18);font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.hubnav *{box-sizing:border-box}
+.hubnav__in{max-width:1120px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hubnav__home{display:flex;align-items:center;gap:7px;font-weight:800;color:#f1c46a;text-decoration:none;font-size:15px;white-space:nowrap}
+.hubnav__home:hover{color:#fff}
+.hubnav__links{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.hubnav__links a{color:#cfe3e2;text-decoration:none;font-size:13px;padding:5px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s;line-height:1.4}
+.hubnav__links a:hover{background:rgba(255,255,255,.09);color:#fff}
+.hubnav__links a.is-active{background:#089aa2;color:#fff;font-weight:700}
+@media(max-width:680px){.hubnav__in{padding:8px 14px;gap:10px}.hubnav__links a{font-size:12px;padding:4px 9px}}
+</style>
+<nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴"><div class="hubnav__in"><a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a><div class="hubnav__links"><a href="curriculum.html">교육 교재</a><a href="handbook.html" class="is-active">완전 활용 핸드북</a><a href="install-guide.html">로컬 설치</a><a href="advanced-guide.html">운영·확장</a><a href="multiagent-guide.html">멀티 에이전트</a><a href="telegram-handson.html">텔레그램 핸즈온</a></div></div></nav>
+
+<div class="topbar"><div class="topfill" id="topfill"></div></div>
+
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<header>
+  <span class="kicker"><span class="dot"></span>Hermes Agent · NousResearch · 운영 핸드북</span>
+  <h1>Hermes Agent <span class="hl">완전 활용</span> 핸드북</h1>
+  <p class="lede">Jack의 YouTube 영상(<code>k5NhsF7t68M</code>)을 NousResearch 공식 문서로 교차 검증해 재작성한 핸즈온 가이드. 마케팅 과장과 실제 기능을 분리하고, 영상이 얼버무린 명령어·설정을 실제 값으로 보강했습니다.</p>
+  <div class="chips">
+    <span class="chip"><span class="miniicon"></span>14개 챕터</span>
+    <span class="chip"><span class="miniicon coral"></span>복붙 템플릿 7종</span>
+    <span class="chip"><span class="miniicon amber"></span>트러블슈팅 10건</span>
+    <span class="chip"><span class="miniicon green"></span>공식 docs 검증</span>
+  </div>
+  <div class="proof-grid">
+    <div class="proof"><div class="big">~2분</div><div class="cap"><em>설치→첫대화</em> Quickstart 기준</div></div>
+    <div class="proof"><div class="big">60s</div><div class="cap">gateway <em>cron tick</em> 주기</div></div>
+    <div class="proof dark"><div class="big">2000</div><div class="cap"><em>SOUL.md</em> 권장 단어 상한</div></div>
+    <div class="proof"><div class="big">40+</div><div class="cap">내장 <em>tool</em> 개수</div></div>
+  </div>
+</header>
+
+<!-- ============ PROGRESS ============ -->
+<div class="progress-card">
+  <svg class="ring" viewBox="0 0 64 64">
+    <circle class="bg" cx="32" cy="32" r="27"></circle>
+    <circle class="fg" id="ring" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+  </svg>
+  <div class="progress-meta">
+    <div class="pct" id="pct">0%</div>
+    <div class="ptext" id="ptext">각 단계의 "이 장면 확인"을 눌러 진행률을 추적하세요</div>
+  </div>
+  <button class="reset" id="resetbtn">초기화</button>
+</div>
+
+<div class="banner" id="banner">
+  <span class="em">🎉</span>
+  <div><b>모든 단계 완료!</b><p>Hermes Agent 핸드북을 끝까지 따라왔습니다. 이제 당신의 에이전트는 Lambo를 풀스로틀로 모는 셈입니다.</p></div>
+</div>
+
+<!-- ============ 0. 마케팅 vs 실제 ============ -->
+<div class="section-label">// 0. 먼저 — 마케팅과 실제를 분리</div>
+<div class="panel">
+  <h2>영상의 "자작 제품"과 Hermes 기본 기능 구분</h2>
+  <p>발표자(Jack)는 Hermes 자체 기능과 <strong>본인이 만들어 파는 제품·대시보드</strong>를 섞어 설명합니다. "내 화면엔 그게 없는데?" 하는 혼란을 막기 위해 먼저 분리합니다.</p>
+  <table class="matrix">
+    <tr><th>영상에서 부른 이름</th><th>정체</th><th>기본 제공?</th></tr>
+    <tr><td>메모리 (SOUL.md / MEMORY.md)</td><td><strong>공식 기능</strong></td><td class="ok">✅</td></tr>
+    <tr><td><code>/background</code> <code>/goal</code> <code>/stop</code> <code>/model</code> 등</td><td><strong>공식 슬래시 명령</strong></td><td class="ok">✅</td></tr>
+    <tr><td>cron 스케줄링</td><td><strong>공식 기능</strong></td><td class="ok">✅</td></tr>
+    <tr><td>Obsidian·GitHub·MCP 연결</td><td><strong>공식 스킬/MCP</strong></td><td class="ok">✅</td></tr>
+    <tr><td>모델 라우팅 (Grok·Gemini·Codex 위임)</td><td><strong>공식 기능</strong></td><td class="ok">✅</td></tr>
+    <tr><td>"Mission Control" "Pantheon" "Super Goal" "Claude OS Bridge"</td><td>발표자 자작 대시보드 (유료 커뮤니티)</td><td class="no">❌</td></tr>
+    <tr><td>"Hermes가 dream(꿈)을 꾼다"</td><td>cron + self-improvement 루프의 비유</td><td class="mid">△</td></tr>
+  </table>
+  <div class="note tip"><span class="mark"></span><div><b>추정 주의:</b> "Super Goal", "Pantheon"은 발표자의 유료 산출물로 보입니다. 영상만으로 정확한 구현은 검증 불가하므로, 이 핸드북은 <strong>Hermes 공식 기능으로 같은 효과를 내는 방법</strong>을 제시합니다.</div></div>
+</div>
+
+<!-- ============ 1. 설치 ============ -->
+<div class="section-label">// 1. 설치 — 영상이 건너뛴 실제 명령어</div>
+<div class="timeline">
+
+  <section class="step" data-step="1">
+    <div class="node"><span class="num">1</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">데스크톱 설치 (macOS / Linux / WSL2) <span class="badge">setup</span></div>
+      <p class="cdesc">영상은 "업데이트만 해두면 됨"으로 얼버무리지만, 처음 설치는 두 경로 중 하나입니다. (공식 Quickstart 검증)</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal — 방법 A (원클릭)</span></div>
+        <button class="copy" data-copy='curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'>복사</button>
+        <pre><span class="pr">$</span> curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</pre>
+      </div>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal — 방법 B (pip 안정 릴리스)</span></div>
+        <button class="copy" data-copy='pip install hermes-agent&#10;hermes postinstall'>복사</button>
+        <pre><span class="pr">$</span> pip install hermes-agent
+<span class="pr">$</span> hermes postinstall   <span class="cm"># Node.js·브라우저·ripgrep·ffmpeg + 셋업 마법사</span></pre>
+      </div>
+      <div class="note warn"><span class="mark"></span><div><b>Windows:</b> <strong>WSL2를 먼저 설치</strong>하고 WSL2 터미널 안에서 실행. 대시보드 내장 터미널 탭만 WSL2 전용이고 나머지는 네이티브 동작.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="2">
+    <div class="node"><span class="num">2</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">안드로이드(Termux) 설치 <span class="badge blue">mobile pkm</span></div>
+      <p class="cdesc">기존 <strong>Termux / Obsidian / Syncthing</strong> 파이프라인과 직접 연결되는 경로. 공식 install.sh가 Termux를 지원 명시하지만, 모바일은 <em>Termux 전용 가이드의 수동 경로</em> 권장(자동 스크립트가 깨질 수 있음).</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">termux</span></div>
+        <button class="copy" data-copy='curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'>복사</button>
+        <pre><span class="pr">$</span> curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</pre>
+      </div>
+      <div class="note warn"><span class="mark"></span><div><b>주의:</b> 안드로이드는 지원 extras·제한이 데스크톱과 다릅니다. 브라우저 툴 등 일부 네이티브 의존성이 제한될 수 있음(<b>추정</b>, 환경별 상이). 설치 전 공식 docs의 "Termux guide" 확인.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="3">
+    <div class="node"><span class="num">3</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">첫 셋업 & 검증 <span class="badge green">verify</span></div>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+        <button class="copy" data-copy='hermes setup&#10;hermes setup --portal&#10;hermes'>복사</button>
+        <pre><span class="pr">$</span> hermes setup          <span class="cm"># 프로바이더·모델 연결 (OAuth 브라우저)</span>
+<span class="pr">$</span> hermes setup --portal <span class="cm"># Nous Portal — 무인 실행 권장 (OAuth 자동 갱신)</span>
+<span class="pr">$</span> hermes                <span class="cm"># 첫 대화 시작</span></pre>
+      </div>
+      <div class="note info"><span class="mark"></span><div><b>검증 루프:</b> 설치 직후 <code>hermes model</code>로 연결 모델을, <code>hermes memory</code>로 메모리 초기 상태를 <strong>눈으로 확인</strong>한 뒤 다음 단계로. 영상의 "알아서 됨"을 믿지 마세요.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ 2. 메모리 ============ -->
+<div class="section-label">// 2. 메모리 시스템 — Hermes의 핵심</div>
+<div class="panel">
+  <h2>실제 디렉토리 구조</h2>
+  <p>영상이 "Lambo를 10mph로만 모는 격"이라 강조한 부분. 실제 파일 구조(공식 검증):</p>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">~/.hermes/</span></div>
+    <button class="copy" data-copy='~/.hermes/'>복사</button>
+    <pre>~/.hermes/
+├── config.yaml          <span class="cm"># 전체 설정 (프로바이더·모델·메시징·MCP)</span>
+├── .env                 <span class="cm"># API 키 등 비밀값</span>
+├── SOUL.md              <span class="cm"># 에이전트 정체성 (시스템 프롬프트 1순위 슬롯)</span>
+├── memories/
+│   ├── MEMORY.md        <span class="cm"># 영속 메모리 (안정적 사실, 전역)</span>
+│   └── USER.md          <span class="cm"># 사용자별 프로필 (채널/신원별 분리)</span>
+├── skills/              <span class="cm"># 스킬 (번들·설치·에이전트 자작)</span>
+├── sessions/            <span class="cm"># 대화 세션</span>
+├── state.db             <span class="cm"># SQLite (FTS5 전문검색으로 세션 간 회상)</span>
+├── cron/  {jobs.json, output/}
+└── logs/</pre>
+  </div>
+</div>
+
+<div class="timeline">
+  <section class="step" data-step="4">
+    <div class="node"><span class="num">4</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">SOUL.md — "영혼" 파일 작성 <span class="badge">identity</span></div>
+      <p class="cdesc">영상의 "soul.md를 꼭 채워라"는 조언은 <strong>정확</strong>합니다. 세션 시작 시 시스템 프롬프트 <em>1순위 슬롯</em>에 들어가 내장 기본 정체성을 완전히 대체. 인젝션 스캔 후 길면 잘리므로 <strong>2000단어 이하</strong> 유지. 대시보드 편집: <code>Config → Files</code>.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">~/.hermes/SOUL.md (복붙 템플릿 · 영어 권장)</span></div>
+        <button class="copy" data-copy='# Who you are&#10;You are [이름]&apos;s personal assistant. You live in Seoul, KR.&#10;You are direct, concise, and useful. You don&apos;t pad responses with filler.&#10;You match my tone: terse when I&apos;m terse, conversational when I am.&#10;&#10;# What I&apos;m working on&#10;- AI agent pipelines (Termux + Obsidian + Syncthing PKM)&#10;- Korean-language AI/coding education content (vibe coding)&#10;- Self-evolving knowledge wiki automation&#10;&#10;# How you respond&#10;- Korean by default for content/handbooks; English only for code/prompts.&#10;- Keep answers short unless I ask for depth.&#10;- If uncertain, say so. Don&apos;t fabricate.&#10;- Challenge my thinking when I&apos;m about to make an obvious mistake ("look around corners").&#10;&#10;# Boundaries&#10;- Confirm before destructive actions (deleting files, sending money, posting publicly).&#10;- Never send emails/messages without explicit approval.'>복사</button>
+        <pre><span class="cm"># Who you are</span>
+You are [이름]'s personal assistant. You live in Seoul, KR.
+You are direct, concise, and useful. You don't pad responses with filler.
+You match my tone: terse when I'm terse, conversational when I am.
+
+<span class="cm"># What I'm working on</span>
+- AI agent pipelines (Termux + Obsidian + Syncthing PKM)
+- Korean-language AI/coding education content (vibe coding)
+- Self-evolving knowledge wiki automation
+
+<span class="cm"># How you respond</span>
+- Korean by default for content/handbooks; English only for code/prompts.
+- Keep answers short unless I ask for depth.
+- If uncertain, say so. Don't fabricate.
+- Challenge my thinking when I'm about to make a mistake ("look around corners").
+
+<span class="cm"># Boundaries</span>
+- Confirm before destructive actions (deleting files, sending money, posting).
+- Never send emails/messages without explicit approval.</pre>
+      </div>
+      <div class="note tip"><span class="mark"></span><div><b>함정:</b> SOUL.md가 없거나 비었거나 로드 실패하면 Hermes는 기본 정체성으로 폴백합니다. 작성 후 반드시 반영 여부 확인.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="5">
+    <div class="node"><span class="num">5</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">MEMORY.md / USER.md 자동 학습 = "dreaming"의 실체 <span class="badge green">auto</span></div>
+      <p class="cdesc">영상의 "절대 안 잊는다"·"dream을 꾼다"는 실제로는 <strong>스케줄된 review 에이전트</strong>입니다. 약 10턴 후 memory review가 USER.md 갱신, 약 15회 tool 반복 후 skill review가 스킬 갱신, 며칠 방치 세션은 새벽 최종 패스. 마법이 아니라 <em>self-improvement 루프</em>.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+        <button class="copy" data-copy='hermes memory&#10;hermes memory search "docker"'>복사</button>
+        <pre><span class="pr">$</span> hermes memory                <span class="cm"># 현재 메모리 보기</span>
+<span class="pr">$</span> hermes memory search "docker" <span class="cm"># 주제 검색 (SQLite FTS5)</span></pre>
+      </div>
+      <p class="cdesc">"일요일에 뭐 얘기했지?" 회상은 state.db 세션 기록 + FTS5로 동작. 별도 설정 없이 자연어로 물으면 됩니다.</p>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 3. Obsidian ============ -->
+<div class="section-label">// 3. Obsidian 연결 — 기존 PKM과의 핵심 접점</div>
+<div class="timeline">
+  <section class="step" data-step="6">
+    <div class="node"><span class="num">6</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">Obsidian 스킬 연결 & 안전 패턴 <span class="badge blue">pkm</span></div>
+      <p class="cdesc">영상은 "원클릭 붙여넣기"라 하지만 실제로는 <strong>번들 Obsidian 스킬</strong>을 통합니다.</p>
+      <table class="matrix">
+        <tr><th>경로</th><th>방법</th><th>특징</th></tr>
+        <tr><td><strong>번들 Obsidian 스킬</strong></td><td>기본 포함. 볼트 경로만 지정</td><td>읽기·검색·생성. 가장 간단</td></tr>
+        <tr><td><code>kepano/obsidian-skills</code></td><td>Skills Hub 설치 (Obsidian CEO 제작)</td><td>볼트 <strong>읽기·쓰기 양방향</strong></td></tr>
+      </table>
+      <p class="cdesc"><strong>안전 연결 4단계:</strong></p>
+      <div class="note info"><span class="mark"></span><div><b>검증 패턴:</b> ① 한 폴더만 스코프 지정 → ② 무해한 메모 하나만 써보기 → ③ Obsidian에서 마크다운 제대로 들어왔는지 눈으로 확인 → ④ 확인되면 점진 확장. 전체 볼트를 한 번에 열지 마세요.</div></div>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">Hermes 프롬프트 (복붙)</span></div>
+        <button class="copy" data-copy='In my Obsidian vault at [경로], I write a lot about YouTube content strategy. Search that folder and pull me ONE strong insight about intros that I can reuse. Cite the note filename you used.'>복사</button>
+        <pre>In my Obsidian vault at [경로], I write a lot about
+YouTube content strategy. Search that folder and pull me
+ONE strong insight about intros that I can reuse.
+Cite the note filename you used.</pre>
+      </div>
+      <div class="note warn"><span class="mark"></span><div><b>파이프라인 매핑:</b> 번들 <strong>LLM Wiki 스킬</strong>이 "영속·상호연결 마크다운 지식베이스 구축"을 담당 → 당신의 self-evolving wiki 목표와 정면으로 겹칩니다. 기존 Messenger Bot R + Hermes의 KakaoTalk 캡처→요약→위키 흐름과 중복/대체 관계를 점검하세요.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 4. 백그라운드 ============ -->
+<div class="section-label">// 4. 백그라운드 실행 & 멀티태스킹</div>
+<div class="panel">
+  <h2>공식 슬래시 명령</h2>
+  <table class="matrix">
+    <tr><th>명령</th><th>동작</th></tr>
+    <tr><td><code>/background &lt;작업&gt;</code></td><td>대화를 끊지 않고 백그라운드 실행. 여러 개 동시 가능</td></tr>
+    <tr><td><code>/stop</code></td><td>진행 중인 모든 작업 즉시 중단</td></tr>
+    <tr><td><code>/steer &lt;지시&gt;</code></td><td>작업을 <strong>중단하지 않고</strong> 방향만 수정</td></tr>
+    <tr><td><code>/resume</code></td><td>다른 세션 이어받기</td></tr>
+  </table>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">병렬 리서치 예시</span></div>
+    <button class="copy" data-copy='/background Research the most untapped industries for AI automation.&#10;/background Find the best places to live for work-life balance.'>복사</button>
+    <pre><span class="pr">&gt;</span> /background Research the most untapped industries for AI automation.
+<span class="pr">&gt;</span> /background Find the best places to live for work-life balance.
+<span class="cm"># 두 리서치가 충돌 없이 병렬 실행</span></pre>
+  </div>
+</div>
+
+<!-- ============ 5. cron ============ -->
+<div class="section-label">// 5. cron 스케줄링 — "Morning Brief" 실제 구현</div>
+<div class="timeline">
+  <section class="step" data-step="7">
+    <div class="node"><span class="num">7</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">전제: gateway 데몬 띄우기 <span class="badge coral">필수</span></div>
+      <p class="cdesc">영상이 안 알려준 핵심. cron은 <strong>gateway 데몬이 60초마다 스케줄러를 tick</strong> 하며 실행합니다. gateway가 없으면 cron이 안 돕니다.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+        <button class="copy" data-copy='hermes gateway install&#10;sudo hermes gateway install --system&#10;hermes gateway'>복사</button>
+        <pre><span class="pr">$</span> hermes gateway install            <span class="cm"># 사용자 서비스 (로그인 시 자동)</span>
+<span class="pr">$</span> sudo hermes gateway install --system <span class="cm"># Linux 서버: 부팅 시 시스템 서비스</span>
+<span class="pr">$</span> hermes gateway                    <span class="cm"># 또는 포그라운드 직접 실행</span></pre>
+      </div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="8">
+    <div class="node"><span class="num">8</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">cron 작업 생성 (자연어 / CLI) <span class="badge">cron</span></div>
+      <p class="cdesc"><strong>방법 A: 자연어</strong> — gateway만 떠 있으면 그냥 말하면 내부 <code>cronjob</code> 툴로 생성됩니다.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">자연어</span></div>
+        <button class="copy" data-copy="Every morning at 8am, send me a Morning Brief with: 1) today's weather, 2) a motivational quote from a top entrepreneur, 3) my meetings today. Deliver to Telegram.">복사</button>
+        <pre>Every morning at 8am, send me a Morning Brief with:
+1) today's weather, 2) a motivational quote,
+3) my meetings today. Deliver to Telegram.</pre>
+      </div>
+      <p class="cdesc"><strong>방법 B: CLI</strong> — 정확·재현 가능(권장).</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+        <button class="copy" data-copy='hermes cron create --schedule "0 8 * * *" --prompt "Morning Brief: today&apos;s weather in Seoul, one motivational quote, my meetings today." --deliver telegram'>복사</button>
+        <pre><span class="pr">$</span> hermes cron create \
+    --schedule "0 8 * * *" \
+    --prompt "Morning Brief: weather in Seoul, one quote, my meetings." \
+    --deliver telegram</pre>
+      </div>
+      <table class="matrix">
+        <tr><th>관리 명령</th><th>용도</th></tr>
+        <tr><td><code>hermes cron list</code></td><td>작업 목록</td></tr>
+        <tr><td><code>hermes cron status</code></td><td>스케줄러 동작 여부 확인</td></tr>
+        <tr><td><code>hermes cron edit &lt;id&gt; --schedule "every 4h"</code></td><td>스케줄 변경</td></tr>
+        <tr><td><code>hermes cron pause / resume &lt;id&gt;</code></td><td>일시정지 / 재개</td></tr>
+        <tr><td><code>hermes cron run &lt;id&gt;</code></td><td>다음 tick에 강제 실행</td></tr>
+        <tr><td><code>hermes cron remove &lt;id&gt;</code></td><td>삭제</td></tr>
+        <tr><td><code>hermes cron logs &lt;id&gt;</code></td><td>실행 이력·에러 확인</td></tr>
+      </table>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="9">
+    <div class="node"><span class="num">9</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">"6am Dreaming Sequence"를 실제로 — cron 2개 분리 <span class="badge amber">advanced</span></div>
+      <p class="cdesc">영상의 "브리핑 전 6시에 미리 dream"은 <strong>cron 작업 2개</strong>로 구현합니다.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal — 6am dream + 8am brief</span></div>
+        <button class="copy" data-copy='hermes cron create --schedule "0 6 * * *" --prompt "Based on all our conversation history, my meetings, and projects, write 3 core recommendations for today and 1 non-negotiable. Save to today&apos;s note." --deliver none&#10;&#10;hermes cron create --schedule "0 8 * * *" --prompt "Compile today&apos;s Morning Brief: weather, motivational quote, meetings, and today&apos;s 3 recommendations + non-negotiable from the 6am note." --deliver telegram'>복사</button>
+        <pre><span class="cm"># 6am: 모든 맥락 기반 추천 3개 + 절대 할 것 1개 → 노트 저장</span>
+<span class="pr">$</span> hermes cron create --schedule "0 6 * * *" \
+    --prompt "Based on all history/meetings/projects, write 3
+    recommendations + 1 non-negotiable. Save to today's note." \
+    --deliver none
+
+<span class="cm"># 8am: 위 결과 + 날씨/명언/일정 묶어 발송</span>
+<span class="pr">$</span> hermes cron create --schedule "0 8 * * *" \
+    --prompt "Compile Morning Brief: weather, quote, meetings,
+    and 3 recs + non-negotiable from the 6am note." \
+    --deliver telegram</pre>
+      </div>
+      <div class="note tip"><span class="mark"></span><div><b>cron 제약(공식):</b> cron 세션은 <strong>또 다른 cron을 못 만듭니다</strong>(runaway 방지). 최종 응답은 자동 전달 — 프롬프트에 <code>send_message</code> 불필요. <code>--deliver all</code>로 모든 채널 일괄 발송. 무인 실행엔 <code>hermes setup --portal</code>(OAuth 자동 갱신)이 안전.</div></div>
+      <div class="note info"><span class="mark"></span><div><b>파이프라인 매핑:</b> 당신이 구상한 "event-driven hooks vs cron 스케줄링"에서 Hermes cron은 <strong>능동(proactive)</strong> 축, 메시징 게이트웨이가 <strong>반응(reactive)</strong> 축을 담당. 둘 결합 시 "hooks + cron + Obsidian 누적" 아키텍처가 상당 부분 재현됩니다.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 6. 모델 라우팅 ============ -->
+<div class="section-label">// 6. 모델 라우팅 & 위임 — 토큰 아끼며 성능 뽑기</div>
+<div class="panel">
+  <h2>작업별 최적 모델에 위임</h2>
+  <p>비싼 모델로 전부 하지 말고, 작업별로 위임하는 게 영상의 핵심 실용 팁입니다.</p>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal & 슬래시</span></div>
+    <button class="copy" data-copy='hermes model    # 연결 가능 모델 표시 + 추가 (OAuth)&#10;/model          # 대화 중 현재 모델 확인/전환&#10;/handoff        # 모델·페르소나·플랫폼 전환'>복사</button>
+    <pre><span class="pr">$</span> hermes model    <span class="cm"># 연결 가능 모델 표시 + 추가 (OAuth)</span>
+<span class="pr">&gt;</span> /model          <span class="cm"># 대화 중 현재 모델 확인/전환</span>
+<span class="pr">&gt;</span> /handoff        <span class="cm"># 모델·페르소나·플랫폼 전환</span></pre>
+  </div>
+  <table class="matrix">
+    <tr><th>작업</th><th>영상 권장 모델</th><th>비고</th></tr>
+    <tr><td>X(트위터) 실시간 검색·트렌드</td><td>Grok (xAI)</td><td>X 전체 DB 접근, 100만 토큰 컨텍스트</td></tr>
+    <tr><td>멀티모달 (영상·이미지·긴 문서)</td><td>Gemini (Anti-gravity CLI)</td><td>Gemini CLI가 Anti-gravity로 대체됨</td></tr>
+    <tr><td>코드 리뷰</td><td>OpenAI Codex</td><td>—</td></tr>
+    <tr><td>디자인·고품질 대화</td><td>Opus (영상 "4.7")</td><td>API 크레딧 유료. <strong>가격·버전 변동 큼</strong></td></tr>
+    <tr><td>모든 모델 접근</td><td>OpenRouter</td><td>DeepSeek 등 위임 가능</td></tr>
+  </table>
+  <div class="note warn"><span class="mark"></span><div><b>검증 주의:</b> "Opus 4.7", "Grok 4.3", "DeepSeek V4" 같은 버전 숫자는 <strong>영상 시점 기준</strong>이며 현재와 다를 수 있습니다. 실제 가용 모델은 <code>hermes model</code>로 직접 확인. 가격은 수시 변동.</div></div>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">위임 프롬프트 (복붙)</span></div>
+    <button class="copy" data-copy='Use OpenRouter and delegate to [모델명] to do deep research on [주제]. Don&apos;t use my expensive default model for this.'>복사</button>
+    <pre>Use OpenRouter and delegate to [모델명] to do deep
+research on [주제]. Don't use my expensive default
+model for this.</pre>
+  </div>
+</div>
+
+<!-- ============ 7. 메시징·MCP ============ -->
+<div class="section-label">// 7. 메시징 · 이메일 · MCP 연결</div>
+<div class="timeline">
+  <section class="step" data-step="10">
+    <div class="node"><span class="num">10</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">Telegram 연결 (시작용 최선) <span class="badge">messaging</span></div>
+      <p class="cdesc">동일 게이트웨이에서 Telegram·Discord·Slack·WhatsApp·Signal 지원. <strong>Telegram이 가장 깔끔</strong>(토큰 하나, 설정 블록 하나).</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">config.yaml</span></div>
+        <button class="copy" data-copy='telegram:&#10;  enabled: true&#10;  bot_token: "BotFather에서_받은_토큰"'>복사</button>
+        <pre>telegram:
+  enabled: true
+  bot_token: "BotFather에서_받은_토큰"</pre>
+      </div>
+      <p class="cdesc">@BotFather에서 봇 생성→토큰 받기. @userinfobot에 메시지→본인 숫자 ID 받기.</p>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="11">
+    <div class="node"><span class="num">11</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">이메일·SaaS 연결 (Composio MCP) <span class="badge blue">mcp</span></div>
+      <p class="cdesc">영상은 Zapier MCP를 권하지만, 공식·커뮤니티는 <strong>Composio</strong>(200+ SaaS)를 더 많이 권합니다.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">config.yaml — Composio MCP</span></div>
+        <button class="copy" data-copy='mcp_servers:&#10;  composio:&#10;    url: "https://connect.composio.dev/mcp"&#10;    headers:&#10;      x-consumer-api-key: "YOUR_COMPOSIO_API_KEY"&#10;    connect_timeout: 60&#10;    timeout: 180'>복사</button>
+        <pre>mcp_servers:
+  composio:
+    url: "https://connect.composio.dev/mcp"
+    headers:
+      x-consumer-api-key: "YOUR_COMPOSIO_API_KEY"
+    connect_timeout: 60
+    timeout: 180</pre>
+      </div>
+      <div class="note tip"><span class="mark"></span><div><b>Gmail 권한 세분화:</b> 라벨·보관·삭제·초안은 허용하되 <strong>발송은 막는</strong> 식으로 툴 단위 권한 선택. SOUL.md Boundaries의 "발송 전 승인 필수"로 이중 안전장치.</div></div>
+      <div class="note warn"><span class="mark"></span><div><b>보안(Tirith):</b> Hermes 보안 모듈이 <code>curl | sh</code> 같은 위험 명령을 하드 차단. shell을 <code>approvals.mode: manual</code>로 두면 실행 전 사람 승인 요구.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 8. GitHub 백업 ============ -->
+<div class="section-label">// 8. GitHub 백업 — 에이전트 통째로 보존</div>
+<div class="panel">
+  <h2>매일 private repo 스냅샷</h2>
+  <p>영상이 "잘 언급 안 되는데 매일 돌린다"고 한 작업. 컴퓨터를 바꿔도 정체성·메모리·스킬을 그대로 이전 가능.</p>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal — 백업 cron</span></div>
+    <button class="copy" data-copy='hermes cron create --schedule "0 3 * * *" --prompt "Take a full snapshot of my Hermes config, SOUL.md, memories, and skills, and push to my private GitHub backup repo." --deliver none'>복사</button>
+    <pre><span class="pr">$</span> hermes cron create --schedule "0 3 * * *" \
+    --prompt "Take a full snapshot of my Hermes config,
+    SOUL.md, memories, and skills, and push to my private
+    GitHub backup repo." \
+    --deliver none</pre>
+  </div>
+  <p>GitHub MCP 서버 또는 git 셸 명령으로 동작.</p>
+</div>
+
+<!-- ============ 9. OpenClaw 비교 ============ -->
+<div class="section-label">// 9. OpenClaw / Anti-gravity 비교 & 마이그레이션</div>
+<div class="timeline">
+  <section class="step" data-step="12">
+    <div class="node"><span class="num">12</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">OpenClaw → Hermes 자동 마이그레이션 <span class="badge green">migrate</span></div>
+      <p class="cdesc">영상 결론은 "여러 비서 돌리지 말고 하나에 집중". <code>hermes setup</code>이 <code>~/.openclaw</code>를 자동 감지해 설정·메모리·스킬·API 키 이전을 먼저 제안합니다.</p>
+      <div class="code">
+        <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+        <button class="copy" data-copy='hermes claw migrate&#10;hermes claw migrate --dry-run&#10;hermes claw migrate --preset user-data&#10;hermes claw migrate --overwrite'>복사</button>
+        <pre><span class="pr">$</span> hermes claw migrate              <span class="cm"># 대화형 (전체 프리셋)</span>
+<span class="pr">$</span> hermes claw migrate --dry-run    <span class="cm"># 미리보기 — 먼저 이것부터!</span>
+<span class="pr">$</span> hermes claw migrate --preset user-data <span class="cm"># 비밀값 제외 이전</span>
+<span class="pr">$</span> hermes claw migrate --overwrite  <span class="cm"># 충돌 시 덮어쓰기</span></pre>
+      </div>
+      <div class="note info"><span class="mark"></span><div><b>검증 루프:</b> <code>--dry-run</code>으로 무엇이 옮겨질지 <strong>반드시 먼저 확인</strong>한 뒤 실제 실행.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+
+  <section class="step" data-step="13">
+    <div class="node"><span class="num">13</span><span class="check">✓</span></div>
+    <div class="card">
+      <div class="ctitle">어디서 실행할까 — 로컬 vs VPS vs Docker <span class="badge amber">deploy</span></div>
+      <ul style="list-style:none;margin:6px 0">
+        <li style="padding-left:20px;position:relative;margin:7px 0;color:var(--ink-2);font-size:14.8px"><span style="position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:2px;background:var(--teal);display:block"></span>영상 권장: <strong>본인 컴퓨터에서 24/7 실행</strong>이 가장 쉬움. VPS는 터널링·보안 미흡 시 공격 위험.</li>
+        <li style="padding-left:20px;position:relative;margin:7px 0;color:var(--ink-2);font-size:14.8px"><span style="position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:2px;background:var(--teal);display:block"></span>파일 격리 원하면 <strong>Docker 컨테이너</strong>로 Hermes만 샌드박스 실행.</li>
+        <li style="padding-left:20px;position:relative;margin:7px 0;color:var(--ink-2);font-size:14.8px"><span style="position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:2px;background:var(--teal);display:block"></span>메모리·Obsidian이 로컬에 있으면 로컬 실행이 연결 단순 — 당신의 Termux/Obsidian 구조와 부합.</li>
+      </ul>
+      <div class="note tip"><span class="mark"></span><div><b>추정:</b> 안드로이드 상시 cron 구동은 Termux wake-lock 등 별도 설정과 발열·배터리 고려가 필요합니다.</div></div>
+      <button class="donebtn"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="t">이 장면 확인</span></button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 10. 슬래시 명령 ============ -->
+<div class="section-label">// 10. 자주 쓰는 슬래시 명령 Top 10</div>
+<div class="panel">
+  <table class="matrix">
+    <tr><th>명령</th><th>용도</th></tr>
+    <tr><td><code>/goal &lt;목표&gt;</code></td><td>세션의 북극성. 약 20메시지 동안 목표 해결까지 지속 (Ralph 루프)</td></tr>
+    <tr><td><code>/background &lt;작업&gt;</code></td><td>대화 안 끊고 백그라운드 실행</td></tr>
+    <tr><td><code>/handoff</code></td><td>모델·페르소나·플랫폼 전환</td></tr>
+    <tr><td><code>/model</code></td><td>현재 모델 확인/전환</td></tr>
+    <tr><td><code>/steer &lt;지시&gt;</code></td><td>작업 중단 없이 방향 수정</td></tr>
+    <tr><td><code>/stop</code></td><td>모든 작업 중단</td></tr>
+    <tr><td><code>/resume</code></td><td>다른 세션 이어받기</td></tr>
+    <tr><td><code>/cron ...</code></td><td>스케줄 작업 관리</td></tr>
+    <tr><td><code>/kanban</code></td><td>멀티 에이전트 작업 보드</td></tr>
+    <tr><td><code>/curator</code></td><td>스킬 자동 정비 (Curator)</td></tr>
+  </table>
+  <div class="note info"><span class="mark"></span><div><b>운영 판단:</b> Hermes가 제대로 작동하면 <strong>자연어만으로</strong> 위 동작 대부분을 알아서 합니다. 슬래시 명령은 명시적 제어가 필요할 때만.</div></div>
+</div>
+
+<!-- ============ 11. goal ============ -->
+<div class="section-label">// 11. /goal 제대로 쓰기 — "Super Goal" 공식 대안</div>
+<div class="panel">
+  <h2>사람↔AI 핸드셰이크를 기본 /goal로 재현</h2>
+  <p>"Super Goal"은 발표자 자작 유료 스킬. 핵심 아이디어(작업을 잘게 쪼개 일부는 AI, 일부는 사람이 수행)는 기본 <code>/goal</code> + 명확한 프롬프트로 재현 가능합니다.</p>
+  <div class="note warn"><span class="mark"></span><div><b>영상 교훈:</b> 목표는 반드시 <strong>구체적·검증가능</strong>하게. ❌ "내 비즈니스를 키워줘"(출력 정의 없음→끝없이 돔) / ✅ "이 기준 3개를 충족하는 문서" "이런 모양의 썸네일".</div></div>
+  <div class="code">
+    <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">Goal 프롬프트 (핸드셰이크 내장 · 복붙)</span></div>
+    <button class="copy" data-copy='/goal Launch my [프로젝트] to [측정가능한 목표, 예: 500 signups].&#10;&#10;Break this into bite-sized tasks. For each task, label it [AI] or [ME]:&#10;- [AI] tasks: you do autonomously.&#10;- [ME] tasks: list them clearly so I know what only I can do (e.g. record videos).&#10;&#10;Define a concrete "done" criterion for the whole goal so you know when to stop.&#10;After each milestone, show me the checklist status before continuing.'>복사</button>
+    <pre><span class="pr">&gt;</span> /goal Launch my [프로젝트] to [측정가능 목표, 예: 500 signups].
+
+Break this into bite-sized tasks. Label each [AI] or [ME]:
+- [AI] tasks: you do autonomously.
+- [ME] tasks: list clearly what only I can do (e.g. record videos).
+
+Define a concrete "done" criterion so you know when to stop.
+After each milestone, show me the checklist status first.</pre>
+  </div>
+</div>
+
+<!-- ============ 12. 트러블슈팅 ============ -->
+<div class="section-label">// 12. 트러블슈팅</div>
+<div class="panel">
+  <table class="matrix">
+    <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+    <tr><td>cron 작업이 안 돈다</td><td>gateway 미실행</td><td><code>hermes gateway install</code> 후 <code>hermes cron status</code> 확인</td></tr>
+    <tr><td>같은 cron 두 번 실행</td><td>tick 중복</td><td><code>~/.hermes/cron/.tick.lock</code> 락 작동 확인(보통 자동)</td></tr>
+    <tr><td>정상 명령이 차단됨</td><td>Tirith 보안</td><td>설정에서 Tirith 규칙 검토·조정(기본 유지 권장)</td></tr>
+    <tr><td>SOUL.md 반영 안 됨</td><td>누락/빈 파일/로드 실패</td><td>파일 존재·내용·2000단어 이하 확인</td></tr>
+    <tr><td>토큰 사용량 폭증</td><td>비싼 모델로 전부 처리</td><td>작업별 위임. Telegram은 메시지당 15–20K 토큰</td></tr>
+    <tr><td>Windows 터미널 탭 안 됨</td><td>네이티브 Windows 제약</td><td>WSL2에서 실행(내장 PTY는 WSL2 전용)</td></tr>
+    <tr><td>모델 버전이 영상과 다름</td><td>시점 차이</td><td><code>hermes model</code>로 실제 확인. 버전 숫자 맹신 금지</td></tr>
+    <tr><td>무인 실행 중 OAuth 만료</td><td>토큰 만료</td><td><code>hermes setup --portal</code>(자동 갱신)</td></tr>
+    <tr><td>Termux 일부 툴 안 됨</td><td>안드로이드 의존성 제한</td><td>공식 Termux guide의 지원 extras 확인(<b>추정</b>)</td></tr>
+    <tr><td>Obsidian 노트 엉킴</td><td>전체 볼트 한번에 연결</td><td>한 폴더 스코프→검증→점진 확장</td></tr>
+  </table>
+</div>
+
+<!-- ============ 13. 체크리스트 ============ -->
+<div class="section-label">// 13. 시작용 체크리스트</div>
+<div class="panel">
+  <h2>마지막 점검</h2>
+  <div class="checklist" id="checklist">
+    <div class="grp">설치 & 기본</div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes 설치 (스크립트 또는 pip)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes setup 또는 hermes setup --portal 완료</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes model 로 연결 모델 확인</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes memory 로 메모리 초기 상태 확인</span></div>
+
+    <div class="grp">정체성 & 메모리</div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">SOUL.md 작성 (2000단어 이하, 한국어 콘텐츠 규칙)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">SOUL.md에 Boundaries(발송 전 승인 등) 추가</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">몇 번 대화 후 MEMORY.md 자동 기록 확인</span></div>
+
+    <div class="grp">연결</div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">Telegram 봇 연결 (토큰 + 본인 ID)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">Obsidian: 한 폴더만 스코프 → 검증 → 확장</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">(선택) Composio MCP로 Gmail 연결, 발송 권한 제외</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">GitHub private repo 백업 cron 등록</span></div>
+
+    <div class="grp">자동화 & 운영</div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes gateway install (cron 전제!)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">hermes cron status 로 스케줄러 동작 확인</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">Morning Brief cron 등록 (6am dream + 8am brief 분리)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">작업별 모델 위임 전략 수립 (비싼 모델 남용 방지)</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">/goal 은 측정가능한 "done" 기준과 함께만 사용</span></div>
+    <div class="chk"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="lab">(OpenClaw 사용자) hermes claw migrate --dry-run 먼저</span></div>
+  </div>
+</div>
+
+<!-- ============ 14. 파이프라인 매핑 ============ -->
+<div class="section-label">// 14. 기존 파이프라인과의 통합 관점</div>
+<div class="panel">
+  <h2>요약 매핑</h2>
+  <table class="matrix">
+    <tr><th>기존 구성요소</th><th>Hermes 대응</th><th>통합 판단</th></tr>
+    <tr><td>Termux (안드로이드 런타임)</td><td>Hermes Termux 설치 지원</td><td>공존 가능. 상시 구동 설정 필요</td></tr>
+    <tr><td>Obsidian (self-evolving wiki)</td><td>번들 Obsidian + LLM Wiki 스킬</td><td class="ok"><strong>대체/강화 후보</strong> — 목표 정면 겹침</td></tr>
+    <tr><td>Syncthing (동기화)</td><td>(Hermes 외부)</td><td>유지. 볼트 동기화 계층으로 계속</td></tr>
+    <tr><td>Messenger Bot R (KakaoTalk)</td><td>메시징 게이트웨이(반응형)</td><td class="mid">카톡 미지원 → Bot R 유지 + 후처리 위임</td></tr>
+    <tr><td>cron 자동화</td><td>Hermes 내장 cron (gateway)</td><td class="ok"><strong>통합 후보</strong> — 단일 스케줄러 수렴</td></tr>
+    <tr><td>영속 메모리</td><td>SOUL.md + MEMORY.md + state.db</td><td>핵심 강점. JSON 단일진실원본과 역할 분담</td></tr>
+  </table>
+  <div class="note info"><span class="mark"></span><div><b>설계 제언(추정 포함):</b> ERP 분석의 "JSON 상태=단일 진실원본 + Obsidian=장기 맥락"에서, Hermes는 <strong>장기 맥락(Obsidian/MEMORY.md)</strong>과 <strong>능동 스케줄링(cron)</strong>을 즉시 제공합니다. 단 "JSON 체크리스트로 작업 누락 방지(harness engineering)"는 <code>/goal</code> 핸드셰이크·kanban으로 <strong>부분 대체</strong>될 뿐, ERP의 PostToolUse hook만큼 강한 강제력은 아닙니다(<b>검증 불가·추정</b>). 작업 누락이 critical하면 기존 JSON+hook 방식을 Hermes 스킬로 이식하는 게 안전합니다.</div></div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <p><b>검증 출처:</b> NousResearch/hermes-agent 공식 GitHub(README·installation·quickstart·cli-commands·cron·scheduler.py) · hermes-agent.nousresearch.com/docs · Featherless / LumaDock / Userorbit / NxCode 튜토리얼 · Composio / Felo Search</p>
+  <p style="margin-top:10px"><b>검증 불가(추정 표시):</b> 발표자 자작 "Mission Control / Pantheon / Super Goal / Claude OS Bridge"의 정확한 구현 · 안드로이드 상시 구동 제약 · 특정 모델 버전 숫자(영상 시점 기준)</p>
+  <p style="margin-top:16px;color:var(--muted)">PolarisOS Web Doc 디자인 시스템 v1.0 · 핸즈온 스타일 · 원본 영상 <code>k5NhsF7t68M</code></p>
+</footer>
+
+</div>
+
+<button class="totop" id="totop" title="맨 위로"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+<script>
+(function(){
+  const STORE_KEY='hermes_handbook_steps';
+  const steps=[...document.querySelectorAll('.step')];
+  const ring=document.getElementById('ring');
+  const pct=document.getElementById('pct');
+  const ptext=document.getElementById('ptext');
+  const topfill=document.getElementById('topfill');
+  const banner=document.getElementById('banner');
+  const CIRC=169.6;
+
+  // stagger entry
+  steps.forEach((s,i)=>{ s.style.animationDelay=(i*0.04)+'s'; });
+
+  let done=new Set();
+  try{ const raw=localStorage.getItem(STORE_KEY); if(raw) done=new Set(JSON.parse(raw)); }catch(e){}
+
+  function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify([...done])); }catch(e){} }
+
+  function render(){
+    steps.forEach(s=>{
+      const id=s.dataset.step;
+      if(done.has(id)) s.classList.add('done'); else s.classList.remove('done');
+    });
+    const total=steps.length;
+    const n=done.size;
+    const ratio=total? n/total : 0;
+    ring.style.strokeDashoffset=(CIRC*(1-ratio)).toFixed(1);
+    pct.textContent=Math.round(ratio*100)+'%';
+    ptext.textContent=n+' / '+total+' 단계 확인됨';
+    topfill.style.width=(ratio*100)+'%';
+    banner.classList.toggle('show', n===total && total>0);
+  }
+
+  steps.forEach(s=>{
+    const btn=s.querySelector('.donebtn');
+    if(!btn) return;
+    btn.addEventListener('click',()=>{
+      const id=s.dataset.step;
+      if(done.has(id)) done.delete(id); else done.add(id);
+      save(); render();
+    });
+  });
+
+  document.getElementById('resetbtn').addEventListener('click',()=>{
+    done.clear(); save(); render();
+  });
+
+  // checklist (independent local toggle, not part of step progress)
+  document.querySelectorAll('#checklist .chk').forEach((c,i)=>{
+    const key='hermes_chk_'+i;
+    try{ if(localStorage.getItem(key)==='1') c.classList.add('done'); }catch(e){}
+    c.addEventListener('click',()=>{
+      c.classList.toggle('done');
+      try{ localStorage.setItem(key, c.classList.contains('done')?'1':'0'); }catch(e){}
+    });
+  });
+
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const txt=b.getAttribute('data-copy')||'';
+      navigator.clipboard.writeText(txt).then(()=>{
+        const o=b.textContent; b.textContent='복사됨'; b.classList.add('copied');
+        setTimeout(()=>{ b.textContent=o; b.classList.remove('copied'); },1400);
+      }).catch(()=>{ b.textContent='실패'; setTimeout(()=>b.textContent='복사',1400); });
+    });
+  });
+
+  // totop
+  const totop=document.getElementById('totop');
+  window.addEventListener('scroll',()=>{
+    totop.classList.toggle('show', window.scrollY>520);
+  });
+  totop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>헤르메스 × 텔레그램 — 따라하기 핸즈온</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF4F2;
+    --paper:#FBFDFC;
+    --surface:#FFFFFF;
+    --ink:#13283C;
+    --ink-2:#37516A;
+    --muted:#6B8294;
+    --teal:#089AA2;
+    --teal-deep:#066B71;
+    --teal-soft:#E2F4F4;
+    --coral:#F4634C;
+    --coral-soft:#FDEAE6;
+    --amber:#D9920F;
+    --amber-soft:#FBF1DC;
+    --green:#1AA46F;
+    --green-soft:#E1F4EC;
+    --line:#DCE7E4;
+    --line-2:#C9D9D5;
+    --code-bg:#0F2233;
+    --code-ink:#D7E6E8;
+    --shadow:0 1px 2px rgba(19,40,60,.04), 0 8px 24px -12px rgba(19,40,60,.18);
+    --shadow-lg:0 2px 6px rgba(19,40,60,.05), 0 24px 48px -20px rgba(19,40,60,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'IBM Plex Sans KR',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* atmospheric background */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(680px 480px at 88% -8%, rgba(8,154,162,.16), transparent 60%),
+      radial-gradient(560px 460px at -6% 12%, rgba(244,99,76,.10), transparent 55%),
+      radial-gradient(700px 600px at 50% 118%, rgba(8,154,162,.10), transparent 60%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:radial-gradient(rgba(19,40,60,.05) 1px, transparent 1px);
+    background-size:22px 22px;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);
+            mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);
+  }
+  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 22px 120px}
+
+  /* top progress */
+  .topbar{position:fixed;top:0;left:0;right:0;height:5px;z-index:50;background:transparent}
+  .topbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),#3DC9BE);
+    box-shadow:0 0 14px rgba(8,154,162,.6);transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+  /* hero */
+  header{padding:62px 0 30px;text-align:left}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-deep);
+    background:var(--teal-soft);padding:7px 13px;border-radius:999px;font-weight:600;
+    border:1px solid rgba(8,154,162,.18)}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);
+    box-shadow:0 0 0 0 rgba(8,154,162,.5);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(8,154,162,.45)}70%{box-shadow:0 0 0 8px rgba(8,154,162,0)}100%{box-shadow:0 0 0 0 rgba(8,154,162,0)}}
+  h1{font-size:clamp(34px,6.4vw,56px);line-height:1.08;letter-spacing:-.02em;font-weight:700;
+    margin:22px 0 0;color:var(--ink)}
+  h1 .hl{position:relative;white-space:nowrap}
+  h1 .hl::after{content:"";position:absolute;left:-2px;right:-2px;bottom:6px;height:30%;
+    background:linear-gradient(90deg,rgba(8,154,162,.28),rgba(61,201,190,.28));z-index:-1;border-radius:3px}
+  .lede{font-size:18px;color:var(--ink-2);margin-top:18px;max-width:60ch;font-weight:300}
+  .lede b{font-weight:600;color:var(--ink)}
+
+  /* prereq chips */
+  .prereq{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);
+    padding:9px 14px;border-radius:12px;font-size:14px;color:var(--ink-2);box-shadow:var(--shadow)}
+  .chip svg{flex:none}
+
+  /* progress card */
+  .pcard{margin-top:30px;background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:20px 22px;display:flex;align-items:center;gap:20px;box-shadow:var(--shadow)}
+  .ring{position:relative;width:64px;height:64px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .bg{stroke:var(--line-2)}
+  .ring .fg{stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)}
+  .ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;
+    font-size:16px;font-weight:600;color:var(--teal-deep)}
+  .pcard .ptext{flex:1}
+  .pcard .ptext strong{display:block;font-size:15.5px}
+  .pcard .ptext span{font-size:13.5px;color:var(--muted)}
+  .reset{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);background:none;
+    border:1px solid var(--line);padding:7px 12px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .reset:hover{color:var(--coral);border-color:var(--coral)}
+
+  /* section label */
+  .seclabel{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin:54px 0 4px;font-weight:600}
+
+  /* timeline */
+  .timeline{position:relative;margin-top:18px;padding-left:54px}
+  .timeline::before{content:"";position:absolute;left:21px;top:6px;bottom:30px;width:2px;
+    background:linear-gradient(180deg,var(--teal),var(--line-2) 92%)}
+  .step{position:relative;margin-bottom:24px;opacity:0;transform:translateY(16px);
+    animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+  .node{position:absolute;left:-54px;top:0;width:44px;height:44px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--line-2);display:grid;place-items:center;
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:17px;color:var(--ink-2);
+    box-shadow:0 4px 12px -4px rgba(19,40,60,.2);transition:.35s;z-index:2}
+  .step.done .node{background:var(--green);border-color:var(--green);color:#fff;transform:scale(1.04)}
+  .node .chk{display:none}
+  .step.done .node .num{display:none}
+  .step.done .node .chk{display:block}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 26px;
+    box-shadow:var(--shadow);transition:box-shadow .3s, transform .3s, opacity .35s}
+  .card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+  .step.done .card{opacity:.72}
+  .step.done .card .ctitle{text-decoration:line-through;text-decoration-color:var(--line-2)}
+
+  .ctitle{font-size:21px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .ctitle .where{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    padding:4px 9px;border-radius:7px;background:var(--teal-soft);color:var(--teal-deep);
+    text-decoration:none;transform:translateY(-2px)}
+  .ctitle .where.srv{background:#EEF1F4;color:#4A5C6E}
+  .cdesc{color:var(--ink-2);margin-top:10px;font-size:15.5px;font-weight:300}
+  .cdesc b{font-weight:600;color:var(--ink)}
+
+  /* ordered substeps */
+  ol.sub{margin:16px 0 0;padding:0;counter-reset:s;list-style:none}
+  ol.sub>li{position:relative;padding:3px 0 3px 30px;margin-bottom:7px;font-size:15px;color:var(--ink-2)}
+  ol.sub>li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:3px;
+    width:21px;height:21px;border-radius:6px;background:var(--paper);border:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:var(--teal-deep);
+    display:grid;place-items:center}
+  ol.sub b{color:var(--ink);font-weight:600}
+  .kbd{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#EAF1EF;border:1px solid var(--line);
+    border-bottom-width:2px;padding:1px 7px;border-radius:6px;color:var(--ink);white-space:nowrap}
+
+  /* code block */
+  .code{position:relative;margin-top:15px;background:var(--code-bg);border-radius:13px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+  .code .head{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .code .head .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:#7E99A2;margin-left:4px}
+  .tl{width:11px;height:11px;border-radius:50%}
+  .tl.r{background:#FF6058}.tl.y{background:#FFBD2E}.tl.g{background:#28C840}
+  .code pre{margin:0;padding:16px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+    font-size:13.5px;line-height:1.85;color:var(--code-ink)}
+  .code pre .cm{color:#6E8A93}
+  .code pre .pr{color:#3DC9BE}
+  .copy{position:absolute;top:9px;right:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    color:#CFE3E4;font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:6px 11px;border-radius:8px;
+    cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px}
+  .copy:hover{background:rgba(255,255,255,.16)}
+  .copy.ok{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* callouts */
+  .note{display:flex;gap:12px;margin-top:15px;padding:13px 16px;border-radius:12px;font-size:14.5px;line-height:1.62}
+  .note .ico{flex:none;font-size:17px;line-height:1.5}
+  .note b{font-weight:600}
+  .note.warn{background:var(--coral-soft);border:1px solid rgba(244,99,76,.25);color:#8a2a1c}
+  .note.warn b{color:#b3331f}
+  .note.tip{background:var(--amber-soft);border:1px solid rgba(217,146,15,.28);color:#73510a}
+  .note.tip b{color:#8a5e07}
+  .note.dig{background:var(--teal-soft);border:1px solid rgba(8,154,162,.22);color:#0a5b60}
+  .note.dig b{color:var(--teal-deep)}
+
+  /* check toggle */
+  .donebtn{margin-top:20px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+    background:var(--paper);border:1.5px dashed var(--line-2);color:var(--ink-2);font-family:inherit;
+    font-size:14.5px;font-weight:500;padding:12px;border-radius:12px;cursor:pointer;transition:.25s}
+  .donebtn:hover{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-soft)}
+  .step.done .donebtn{background:var(--green-soft);border:1.5px solid var(--green);color:#127a52}
+  .donebtn .box{width:19px;height:19px;border-radius:6px;border:2px solid currentColor;display:grid;place-items:center}
+  .donebtn .box svg{opacity:0;transform:scale(.5);transition:.2s}
+  .step.done .donebtn .box{background:var(--green);border-color:var(--green)}
+  .step.done .donebtn .box svg{opacity:1;transform:scale(1)}
+
+  /* generic panel (non-step sections) */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 26px;
+    box-shadow:var(--shadow);margin-top:18px}
+  .panel h3{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .panel p{color:var(--ink-2);margin-top:8px;font-size:15px;font-weight:300}
+
+  /* mode cards */
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .mode{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);
+    transition:.3s}
+  .mode:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .mode .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;
+    padding:4px 9px;border-radius:7px;display:inline-block}
+  .mode.s .tag{background:var(--coral-soft);color:#b3331f}
+  .mode.q .tag{background:var(--amber-soft);color:#8a5e07}
+  .mode.b .tag{background:var(--teal-soft);color:var(--teal-deep)}
+  .mode h4{font-size:16px;margin-top:11px;font-weight:600}
+  .mode p{font-size:13.5px;color:var(--ink-2);margin-top:6px;font-weight:300;line-height:1.6}
+
+  /* cheatsheet */
+  table.cheat{width:100%;border-collapse:collapse;margin-top:16px;font-size:14.5px}
+  table.cheat td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.cheat tr:last-child td{border-bottom:none}
+  table.cheat td:first-child{width:1%;white-space:nowrap}
+  table.cheat code{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--teal-soft);
+    color:var(--teal-deep);padding:3px 9px;border-radius:7px;font-weight:600}
+  table.cheat td:last-child{color:var(--ink-2)}
+
+  /* troubleshoot */
+  .ts{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .ts .row{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);
+    border-radius:12px;padding:13px 16px}
+  .ts .n{flex:none;width:25px;height:25px;border-radius:8px;background:var(--coral-soft);color:#b3331f;
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;display:grid;place-items:center}
+  .ts .row b{font-weight:600}
+  .ts .row p{font-size:14px;color:var(--ink-2);margin-top:2px}
+
+  /* checklist (security) */
+  .clist{margin-top:16px;display:flex;flex-direction:column;gap:9px}
+  .clist label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:14.5px;color:var(--ink-2);
+    padding:11px 14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;transition:.2s}
+  .clist label:hover{border-color:var(--line-2)}
+  .clist input{display:none}
+  .clist .b{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--line-2);
+    display:grid;place-items:center;transition:.2s;margin-top:1px}
+  .clist .b svg{opacity:0;transform:scale(.5);transition:.2s}
+  .clist input:checked~.b{background:var(--teal);border-color:var(--teal)}
+  .clist input:checked~.b svg{opacity:1;transform:scale(1)}
+  .clist input:checked~span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line-2)}
+
+  /* footer */
+  footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  footer a{color:var(--teal-deep);text-decoration:none;border-bottom:1px solid rgba(8,154,162,.3)}
+  footer .done-banner{display:none;background:var(--green-soft);border:1px solid var(--green);color:#127a52;
+    border-radius:14px;padding:16px 20px;margin-bottom:22px;font-size:15px;font-weight:500;align-items:center;gap:10px}
+  footer .done-banner.show{display:flex;animation:rise .5s ease forwards}
+
+  /* to top */
+  .totop{position:fixed;right:20px;bottom:20px;z-index:40;width:46px;height:46px;border-radius:14px;
+    background:var(--ink);color:#fff;border:none;cursor:pointer;display:grid;place-items:center;
+    box-shadow:var(--shadow-lg);opacity:0;transform:translateY(12px);pointer-events:none;transition:.3s}
+  .totop.show{opacity:1;transform:none;pointer-events:auto}
+  .totop:hover{background:var(--teal-deep)}
+
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @media(max-width:640px){
+    .wrap{padding:0 16px 90px}
+    header{padding:46px 0 24px}
+    .pcard{flex-wrap:wrap}
+    .modes{grid-template-columns:1fr}
+    .timeline{padding-left:46px}
+    .timeline::before{left:18px}
+    .node{left:-46px;width:38px;height:38px;font-size:15px}
+    .card{padding:20px 18px}
+    .ctitle{font-size:19px}
+  }
+</style>
+</head>
+<body>
+
+<style>
+.hubnav{position:sticky;top:0;z-index:99999;background:#0f2330;color:#f5f7f6;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.18);font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.hubnav *{box-sizing:border-box}
+.hubnav__in{max-width:1120px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hubnav__home{display:flex;align-items:center;gap:7px;font-weight:800;color:#f1c46a;text-decoration:none;font-size:15px;white-space:nowrap}
+.hubnav__home:hover{color:#fff}
+.hubnav__links{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.hubnav__links a{color:#cfe3e2;text-decoration:none;font-size:13px;padding:5px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s;line-height:1.4}
+.hubnav__links a:hover{background:rgba(255,255,255,.09);color:#fff}
+.hubnav__links a.is-active{background:#089aa2;color:#fff;font-weight:700}
+@media(max-width:680px){.hubnav__in{padding:8px 14px;gap:10px}.hubnav__links a{font-size:12px;padding:4px 9px}}
+</style>
+<nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴"><div class="hubnav__in"><a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a><div class="hubnav__links"><a href="curriculum.html">교육 교재</a><a href="handbook.html">완전 활용 핸드북</a><a href="install-guide.html">로컬 설치</a><a href="advanced-guide.html">운영·확장</a><a href="multiagent-guide.html">멀티 에이전트</a><a href="telegram-handson.html" class="is-active">텔레그램 핸즈온</a></div></div></nav>
+
+<div class="topbar"><i id="topfill"></i></div>
+
+<div class="wrap">
+  <header>
+    <span class="kicker"><span class="dot"></span>HANDS-ON · 텔레그램 연동</span>
+    <h1>헤르메스 AI 비서를<br><span class="hl">텔레그램</span>으로 부리기</h1>
+    <p class="lede">24시간 켜둔 서버에 깔린 <b>헤르메스(Hermes Agent)</b>를, 봇파더부터 그룹·토픽까지 <b>순서대로 따라만 하면</b> 텔레그램에서 바로 명령할 수 있게 됩니다. 각 단계를 끝낼 때마다 체크하면 진행률이 차오릅니다.</p>
+
+    <div class="prereq">
+      <span class="chip">🖥️ 24시간 서버(내 PC 또는 VPS)에 헤르메스 설치 완료</span>
+      <span class="chip">📨 텔레그램 계정</span>
+      <span class="chip">🔑 LLM 키(OpenAI·OpenRouter 등)</span>
+    </div>
+
+    <div class="pcard">
+      <div class="ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle class="bg" cx="32" cy="32" r="27" fill="none" stroke-width="6"/>
+          <circle id="ringfg" class="fg" cx="32" cy="32" r="27" fill="none" stroke-width="6"
+            stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
+        </svg>
+        <b id="ringpct">0%</b>
+      </div>
+      <div class="ptext">
+        <strong id="ptitle">시작해 볼까요?</strong>
+        <span id="psub">7단계 중 <b id="pdone">0</b>단계 완료</span>
+      </div>
+      <button class="reset" id="resetbtn">진행 초기화</button>
+    </div>
+  </header>
+
+  <div class="seclabel">// 설치 & 연결</div>
+  <div class="timeline" id="timeline">
+
+    <!-- STEP 1 -->
+    <div class="step" data-step="1" style="animation-delay:.05s">
+      <div class="node"><span class="num">1</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">봇파더에서 봇 만들기 <a class="where">@BotFather</a></div>
+        <p class="cdesc">텔레그램 봇은 전부 <b>@BotFather</b>에서 시작합니다. 새 봇을 만들고 <b>봇 토큰</b>을 받아두는 단계예요.</p>
+        <ol class="sub">
+          <li>텔레그램에서 <span class="kbd">@BotFather</span> 검색 후 대화 시작</li>
+          <li><span class="kbd">/newbot</span> 입력</li>
+          <li><b>표시 이름</b> 입력 — 자유롭게 (예: <span class="kbd">헤매봇</span>)</li>
+          <li><b>사용자명</b> 입력 — 전 세계에서 고유하고 <b>반드시 <span class="kbd">bot</span>으로 끝나야</b> 함 (예: <span class="kbd">zero_haemae_bot</span>)</li>
+          <li>봇파더가 주는 <b>봇 토큰</b> 복사 (아래 형태)</li>
+        </ol>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">bot token</span></div>
+          <button class="copy" data-copy="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">복사</button>
+          <pre>123456789:ABCdefGHIjklMNOpqrSTUvwxYZ</pre>
+        </div>
+        <div class="note warn"><span class="ico">⚠️</span><div><b>토큰은 비밀번호입니다.</b> 가진 사람은 누구나 봇을 조종할 수 있어요. 유출되면 봇파더에서 <span class="kbd">/revoke</span>로 즉시 재발급하세요.</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" data-step="2" style="animation-delay:.1s">
+      <div class="node"><span class="num">2</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">봇 메뉴 설정 + <b style="color:var(--coral)">프라이버시 끄기</b> <a class="where">@BotFather</a></div>
+        <p class="cdesc">슬래시 메뉴를 등록하고, <b>그룹에서 안 막히도록</b> 프라이버시 모드를 손봅니다. 영상에서 "그룹인데 답을 안 한다"고 헤맸던 바로 그 부분이에요.</p>
+
+        <ol class="sub">
+          <li>@BotFather에 <span class="kbd">/setcommands</span> → 내 봇 선택 → 아래 목록 붙여넣기</li>
+        </ol>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">command menu</span></div>
+          <button class="copy" data-copy="new - 새 대화 시작
+model - AI 모델 보기/변경
+status - 세션 정보
+help - 도움말
+sethome - 이 채팅을 홈 채널로 지정">복사</button>
+          <pre>new - 새 대화 시작
+model - AI 모델 보기/변경
+status - 세션 정보
+help - 도움말
+sethome - 이 채팅을 홈 채널로 지정</pre>
+        </div>
+
+        <ol class="sub" style="margin-top:18px">
+          <li><span class="kbd">/mybots</span> → 내 봇 → <b>Bot Settings → Group Privacy → Turn off</b></li>
+        </ol>
+        <div class="note warn"><span class="ico">🔁</span><div><b>설정을 바꾼 뒤에는 봇을 그룹에서 내보냈다가 다시 초대</b>해야 합니다. 텔레그램은 봇이 들어온 시점의 프라이버시 상태를 캐싱하기 때문이에요.</div></div>
+        <div class="note dig"><span class="ico">🔎</span><div><b>더 쉬운 대안:</b> 프라이버시를 끄는 대신 봇을 <b>그룹 관리자(admin)</b>로 올리면, 설정과 무관하게 모든 메시지를 받습니다. 영상의 결말도 "관리자 등록이 빠져 있었다"였죠.</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" data-step="3" style="animation-delay:.15s">
+      <div class="node"><span class="num">3</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">내 User ID 알아내기 <a class="where">@userinfobot</a></div>
+        <p class="cdesc">헤르메스는 <b>@아이디가 아니라 숫자 User ID</b>로 권한을 관리합니다. 이 숫자를 미리 확보해 두세요.</p>
+        <ol class="sub">
+          <li>텔레그램에서 <span class="kbd">@userinfobot</span> 에게 아무 메시지나 전송</li>
+          <li>즉시 답해주는 <b>숫자 ID</b>(예: <span class="kbd">123456789</span>) 복사 — 대안: <span class="kbd">@get_id_bot</span></li>
+        </ol>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" data-step="4" style="animation-delay:.2s">
+      <div class="node"><span class="num">4</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">헤르메스에 텔레그램 연결 <a class="where srv">서버 터미널</a></div>
+        <p class="cdesc">서버에서 게이트웨이 설정 마법사를 돌립니다. <b>게이트웨이</b>는 헤르메스 ↔ 텔레그램을 잇는 중간 다리예요.</p>
+
+        <p class="cdesc" style="margin-top:14px"><b>방법 A — 대화형 (권장)</b></p>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+          <button class="copy" data-copy="hermes gateway setup">복사</button>
+          <pre><span class="pr">$</span> hermes gateway setup   <span class="cm"># Telegram 선택 → 토큰 붙여넣기 → User ID 입력</span></pre>
+        </div>
+
+        <p class="cdesc" style="margin-top:16px"><b>방법 B — 수동</b> · <span class="kbd">~/.hermes/.env</span> 파일에 추가</p>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">~/.hermes/.env</span></div>
+          <button class="copy" data-copy="TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+TELEGRAM_ALLOWED_USERS=123456789">복사</button>
+          <pre>TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+TELEGRAM_ALLOWED_USERS=123456789   <span class="cm"># 여러 명이면 쉼표로</span></pre>
+        </div>
+        <div class="note tip"><span class="ico">💡</span><div>이 단계에서 User ID를 <b>그냥 넘어가도</b> 됩니다. 나중에 텔레그램에서 <b>"지금부터 나만 메시지 보낼 수 있게 해줘"</b>라고 말로 시켜도 돼요. (단, 보안상 꼭 해두세요.)</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" data-step="5" style="animation-delay:.25s">
+      <div class="node"><span class="num">5</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">게이트웨이 실행 & 24시간 가동 <a class="where srv">서버 터미널</a></div>
+        <p class="cdesc">먼저 테스트로 띄워 응답을 확인하고, 그 다음 <b>재부팅에도 살아남는 서비스</b>로 등록합니다.</p>
+
+        <p class="cdesc" style="margin-top:14px"><b>① 테스트 실행</b> — 봇에 메시지 보내 응답 확인 후 <span class="kbd">Ctrl+C</span></p>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+          <button class="copy" data-copy="hermes gateway">복사</button>
+          <pre><span class="pr">$</span> hermes gateway
+<span class="cm">[Gateway] Telegram adapter connected ✓</span></pre>
+        </div>
+
+        <p class="cdesc" style="margin-top:16px"><b>② 서비스로 설치 & 관리</b></p>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">terminal</span></div>
+          <button class="copy" data-copy="hermes gateway install
+sudo hermes gateway install --system
+hermes gateway start
+hermes gateway status
+sudo loginctl enable-linger $USER">복사</button>
+          <pre><span class="pr">$</span> hermes gateway install              <span class="cm"># 사용자 서비스 설치</span>
+<span class="pr">$</span> sudo hermes gateway install --system <span class="cm"># 부팅 시 자동 시작(Linux)</span>
+<span class="pr">$</span> hermes gateway start                <span class="cm"># 시작 (stop/status/restart)</span>
+<span class="pr">$</span> sudo loginctl enable-linger $USER    <span class="cm"># SSH 끊겨도 계속 가동</span></pre>
+        </div>
+        <div class="note tip"><span class="ico">💡</span><div>설정을 바꿔 재시작이 필요할 땐 직접 안 해도 됩니다. 봇에 <span class="kbd">/update</span>를 보내거나 <b>"너 스스로 게이트웨이 재시작해"</b>라고 말하면 알아서 처리해요.</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" data-step="6" style="animation-delay:.3s">
+      <div class="node"><span class="num">6</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">권한 — 나만 / 우리 팀만 쓰게 <a class="where srv">서버 터미널</a></div>
+        <p class="cdesc">허용목록을 미설정하면 게이트웨이는 <b>기본적으로 모든 사용자를 거부</b>합니다. 본인 ID를 꼭 넣으세요.</p>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">~/.hermes/.env</span></div>
+          <button class="copy" data-copy="TELEGRAM_ALLOWED_USERS=123456789,987654321">복사</button>
+          <pre>TELEGRAM_ALLOWED_USERS=123456789,987654321  <span class="cm"># 변경 후 gateway 재시작</span></pre>
+        </div>
+        <div class="note dig"><span class="ico">🔎</span><div><b>팀이라면 DM 페어링이 편합니다.</b> 팀원이 봇에 DM하면 일회용 코드(예: <span class="kbd">XKGH5N7P</span>)가 발급되고, 소유자가 서버에서 <span class="kbd">hermes pairing approve telegram XKGH5N7P</span>로 승인하면 즉시 사용 가능 — 게이트웨이 재시작도 불필요. (코드는 1시간 후 만료)</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step" data-step="7" style="animation-delay:.35s">
+      <div class="node"><span class="num">7</span><span class="chk">✓</span></div>
+      <div class="card">
+        <div class="ctitle">그룹 + 토픽으로 주제 분리 <a class="where">Telegram 앱</a></div>
+        <p class="cdesc">한 봇으로 <b>개발 / 일상 / 재테크</b>처럼 맥락이 완전히 분리된 대화를 동시에. 헤르메스가 여러 작업을 병렬로 처리하게 만드는 핵심 활용법입니다.</p>
+        <ol class="sub">
+          <li>텔레그램 → <b>New Group</b>으로 그룹 생성(예: "헤매봇 비서실") → 봇을 멤버로 추가</li>
+          <li>그룹 → <b>Manage Group → Topics</b> 토글 <b>켜기</b></li>
+          <li>그룹 → <b>Administrators</b>에 봇을 <b>관리자로 추가</b> → 저장</li>
+          <li>상단 토픽 영역 → <b>Create Topic</b>으로 <span class="kbd">재테크</span> <span class="kbd">일상</span> <span class="kbd">개발</span> 생성</li>
+          <li>토픽 안에서 봇 멘션으로 호출 → <b>토픽마다 다른 주제</b>로 대화</li>
+        </ol>
+        <div class="code">
+          <div class="head"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="lbl">in topic chat</span></div>
+          <button class="copy" data-copy="@zero_haemae_bot 오늘 저녁 뭐 먹지?">복사</button>
+          <pre><span class="cm"># '일상' 토픽에서</span>
+@zero_haemae_bot 오늘 저녁 뭐 먹지?</pre>
+        </div>
+        <div class="note warn"><span class="ico">⚠️</span><div>그룹 진입 직후 바로 입력하면 <b>'일반(General)' 영역</b>으로 갑니다. 항상 <b>올바른 토픽을 선택했는지 확인</b> 후 메시지를 남기세요. 그룹에서도 한 번 <span class="kbd">/sethome</span> 실행을 권장합니다.</div></div>
+        <div class="note dig"><span class="ico">🔎</span><div><b>그룹 없이도 가능:</b> 봇 DM에서 <span class="kbd">/topic</span>을 켜면 1:1 대화 안에서도 토픽(병렬 세션)을 만들 수 있어요. (Bot API 9.4 신기능 — 사전에 BotFather <b>Threads Settings</b> 활성화 필요)</div></div>
+        <button class="donebtn"><span class="box"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">이 단계 완료 🎉</span></button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== 사용법: 메시지 모드 ===== -->
+  <div class="seclabel">// 알아두면 좋은 사용법</div>
+  <div class="panel">
+    <h3>작업 중에 메시지 보내기 — 3가지 모드</h3>
+    <p>헤르메스가 <b>작업 중일 때</b> 추가 메시지를 어떻게 처리할지 결정합니다. 봇 이름 옆 <b>"입력 중(typing)"</b> 표시가 떠 있으면 작업 중이라는 신호예요.</p>
+    <div class="modes">
+      <div class="mode s"><span class="tag">STEER · 기본</span><h4>말 끼어들기</h4><p>그냥 메시지 입력. 하던 작업을 즉시 멈추고 새 지시에 집중. 오타·잘못된 지시를 바로잡을 때.</p></div>
+      <div class="mode q"><span class="tag">QUEUE · 큐</span><h4>이어서 하기</h4><p>지금 작업을 <b>완료한 뒤</b> 이 작업을 순서대로 이어서 수행.</p></div>
+      <div class="mode b"><span class="tag">BACKGROUND</span><h4>동시에 하기</h4><p><span class="kbd" style="font-size:11px">/background</span> 로 별도 인스턴스에서 동시 실행. <b>과정은 안 보이고 결과만</b> 도착.</p></div>
+    </div>
+  </div>
+
+  <!-- ===== 치트시트 ===== -->
+  <div class="seclabel">// 슬래시 명령어 치트시트</div>
+  <div class="panel">
+    <table class="cheat">
+      <tr><td><code>/new</code></td><td>새 대화(세션) 시작</td></tr>
+      <tr><td><code>/model</code></td><td>인라인 버튼으로 제공자·모델 선택 (<code>/model 이름</code>으로 즉시 변경)</td></tr>
+      <tr><td><code>/status</code></td><td>현재 세션 정보</td></tr>
+      <tr><td><code>/whoami</code></td><td>내 권한 등급과 실행 가능한 명령 확인</td></tr>
+      <tr><td><code>/sethome</code></td><td>이 채팅/토픽을 홈 채널로 지정 (예약 작업 결과가 도착)</td></tr>
+      <tr><td><code>/background</code></td><td>동시 백그라운드 작업 실행</td></tr>
+      <tr><td><code>/topic</code></td><td>DM 안에서 멀티세션(토픽) 모드 켜기</td></tr>
+      <tr><td><code>/update</code></td><td>최신 버전 업데이트 후 자동 재시작</td></tr>
+      <tr><td><code>/stop</code></td><td>현재 작업 중지</td></tr>
+    </table>
+  </div>
+
+  <!-- ===== 트러블슈팅 ===== -->
+  <div class="seclabel">// 트러블슈팅 — "DM은 되는데 그룹은 무응답"</div>
+  <div class="panel">
+    <div class="ts">
+      <div class="row"><span class="n">1</span><div><b>텔레그램이 메시지를 전달하는가</b><p>봇파더 프라이버시 끄기 또는 봇을 그룹 관리자로 승격</p></div></div>
+      <div class="row"><span class="n">2</span><div><b>프라이버시 변경 후 재초대했는가</b><p>봇을 내보냈다 다시 초대 (캐싱 때문)</p></div></div>
+      <div class="row"><span class="n">3</span><div><b>발신자가 허용목록에 있는가</b><p><span class="kbd">TELEGRAM_ALLOWED_USERS</span> / <span class="kbd">TELEGRAM_GROUP_ALLOWED_CHATS</span> 확인</p></div></div>
+      <div class="row"><span class="n">4</span><div><b>멘션 필터</b><p><span class="kbd">require_mention: true</span>면 멘션·답장·슬래시명령일 때만 반응</p></div></div>
+      <div class="row"><span class="n">5</span><div><b>도구 호출이 중간에 끊김</b><p><b>"이터레이션 최대 횟수를 90회로 늘려줘"</b>라고 지시 (기본 30이면 잦은 끊김)</p></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 트러블슈팅: 텔레그램 웹 로그인 ===== -->
+  <div class="seclabel">// 트러블슈팅 — "텔레그램 웹 로그인이 무한 대기에 걸릴 때"</div>
+  <div class="panel">
+    <p>web.telegram.org에서 <b>전화번호 로그인·QR 로그인이 자주 무한 대기</b>에 걸려 접속이 막힐 때가 있어요. 이때는 <b>패스키(Passkey) 로그인</b>이 빠르고 안정적입니다. 단, 패스키는 <b>모바일 앱에서 먼저 만들어야</b> 웹에서 쓸 수 있어요.</p>
+    <h4 style="font-size:15px;margin-top:18px;margin-bottom:2px;font-weight:600">① 모바일 앱에서 패스키 만들기</h4>
+    <div class="ts">
+      <div class="row"><span class="n">1</span><div><b>텔레그램 앱 → 설정 → 개인정보 및 보안 → 패스키</b><p>앱을 최신 버전으로 업데이트해 두세요 (Android/iOS 안정 버전 지원)</p></div></div>
+      <div class="row"><span class="n">2</span><div><b>"패스키 생성"</b><p>페이스ID·터치ID·지문 또는 기기 PIN으로 인증</p></div></div>
+      <div class="row"><span class="n">3</span><div><b>저장 완료</b><p>iCloud 키체인(Apple) 또는 Google 비밀번호 관리자(Android)에 동기화</p></div></div>
+    </div>
+    <h4 style="font-size:15px;margin-top:18px;margin-bottom:2px;font-weight:600">② 웹에서 패스키로 로그인</h4>
+    <div class="ts">
+      <div class="row"><span class="n">1</span><div><b><span class="kbd">web.telegram.org</span> 접속</b><p>사용자 이름(또는 번호) 입력</p></div></div>
+      <div class="row"><span class="n">2</span><div><b>"패스키로 로그인" 선택</b><p>SMS 코드·QR 무한 대기 대신 패스키 사용</p></div></div>
+      <div class="row"><span class="n">3</span><div><b>생체 인증/PIN → 완료</b><p>SMS 가로채기 위험도 함께 차단</p></div></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">💡 패스키를 켜도 계정은 <b>활성 전화번호</b>에 등록돼 있어야 합니다. · 참고: <a href="https://telegram.org/blog/passkeys-and-gift-offers/ko" target="_blank" rel="noopener" style="color:var(--teal-deep);border-bottom:1px solid rgba(8,154,162,.3);text-decoration:none">텔레그램 공식 패스키 안내</a></p>
+  </div>
+
+  <!-- ===== 보안 체크리스트 ===== -->
+  <div class="seclabel">// 마지막 점검 — 보안</div>
+  <div class="panel">
+    <div class="clist">
+      <label><input type="checkbox"><span class="b"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>봇 토큰을 외부에 노출하지 않았다 (유출 시 <span class="kbd">/revoke</span>)</span></label>
+      <label><input type="checkbox"><span class="b"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="kbd">TELEGRAM_ALLOWED_USERS</span>를 설정해 나만 사용하도록 막았다</span></label>
+      <label><input type="checkbox"><span class="b"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>터미널 권한 봇에 <span class="kbd">GATEWAY_ALLOW_ALL_USERS=true</span>를 쓰지 않았다</span></label>
+      <label><input type="checkbox"><span class="b"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>공유/팀 봇은 터미널 백엔드를 <span class="kbd">docker</span>로 격리했다</span></label>
+      <label><input type="checkbox"><span class="b"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>위험 명령은 채팅의 <b>Exec Approval</b>("yes"/"no")로 직접 승인한다</span></label>
+    </div>
+  </div>
+
+  <footer>
+    <div class="done-banner" id="banner">🎉 7단계를 모두 끝냈어요! 이제 텔레그램에서 헤르메스에게 자유롭게 명령하세요.</div>
+    출처 · 제로초 TV "AI 비서 세팅법"(<a href="https://youtu.be/3Tb9fgyvPNM" target="_blank" rel="noopener">youtu.be/3Tb9fgyvPNM</a>) + Hermes Agent 공식 문서(<a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram" target="_blank" rel="noopener">nousresearch.com</a>) · 🔎 표시는 영상 외 추가 조사 내용 · Hermes Agent by Nous Research (MIT)
+  </footer>
+</div>
+
+<button class="totop" id="totop" aria-label="맨 위로">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+(function(){
+  const STORE_KEY='hermes_tg_steps_done';
+  const steps=[...document.querySelectorAll('.step')];
+  const total=steps.length;
+  const ring=document.getElementById('ringfg');
+  const ringpct=document.getElementById('ringpct');
+  const pdone=document.getElementById('pdone');
+  const ptitle=document.getElementById('ptitle');
+  const psub=document.getElementById('psub');
+  const topfill=document.getElementById('topfill');
+  const banner=document.getElementById('banner');
+  const CIRC=169.6;
+
+  let done=new Set();
+
+  // try persistent storage (artifact API), fallback to memory only
+  async function load(){
+    try{
+      if(window.storage){
+        const r=await window.storage.get(STORE_KEY);
+        if(r&&r.value){ JSON.parse(r.value).forEach(x=>done.add(String(x))); }
+      }
+    }catch(e){/* ignore — in-memory only */}
+    render();
+  }
+  async function save(){
+    try{ if(window.storage){ await window.storage.set(STORE_KEY, JSON.stringify([...done])); } }catch(e){}
+  }
+
+  function render(){
+    steps.forEach(s=>{
+      const id=s.dataset.step;
+      const isDone=done.has(id);
+      s.classList.toggle('done',isDone);
+      const t=s.querySelector('.donebtn .t');
+      if(t) t.textContent=isDone?'완료됨 — 다시 누르면 해제':(id==='7'?'이 단계 완료 🎉':'이 단계 완료');
+    });
+    const n=done.size;
+    const pct=Math.round(n/total*100);
+    ring.style.strokeDashoffset=CIRC-(CIRC*n/total);
+    ringpct.textContent=pct+'%';
+    pdone.textContent=n;
+    topfill.style.width=pct+'%';
+    if(n===0){ptitle.textContent='시작해 볼까요?';}
+    else if(n===total){ptitle.textContent='전부 완료! 잘하셨어요 👏';}
+    else{ptitle.textContent='따라가는 중… 잘하고 있어요';}
+    psub.innerHTML=total+'단계 중 <b>'+n+'</b>단계 완료';
+    banner.classList.toggle('show',n===total);
+  }
+
+  // toggle done
+  document.querySelectorAll('.donebtn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.closest('.step').dataset.step;
+      if(done.has(id))done.delete(id);else{
+        done.add(id);
+        if(done.size===total){confetti();}
+      }
+      render(); save();
+    });
+  });
+
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const txt=b.getAttribute('data-copy');
+      const done2=()=>{const o=b.textContent;b.textContent='복사됨 ✓';b.classList.add('ok');setTimeout(()=>{b.textContent=o;b.classList.remove('ok');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done2).catch(()=>fallback(txt,done2));}
+      else fallback(txt,done2);
+    });
+  });
+  function fallback(txt,cb){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');cb();}catch(e){}document.body.removeChild(ta);}
+
+  // to-top
+  const totop=document.getElementById('totop');
+  window.addEventListener('scroll',()=>{totop.classList.toggle('show',window.scrollY>500);});
+  totop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+  // reset
+  document.getElementById('resetbtn').addEventListener('click',()=>{done.clear();render();save();window.scrollTo({top:0,behavior:'smooth'});});
+
+  // tiny confetti on full completion
+  function confetti(){
+    const colors=['#089AA2','#3DC9BE','#F4634C','#D9920F','#1AA46F'];
+    for(let i=0;i<70;i++){
+      const c=document.createElement('div');
+      const s=6+Math.random()*7;
+      c.style.cssText=`position:fixed;z-index:99;top:-20px;left:${Math.random()*100}vw;width:${s}px;height:${s}px;background:${colors[i%5]};border-radius:${Math.random()>.5?'50%':'2px'};pointer-events:none;opacity:.95;`;
+      document.body.appendChild(c);
+      const dur=2200+Math.random()*1600, drift=(Math.random()-.5)*240, rot=Math.random()*720;
+      c.animate([{transform:`translate(0,0) rotate(0)`,opacity:1},{transform:`translate(${drift}px,105vh) rotate(${rot}deg)`,opacity:.3}],{duration:dur,easing:'cubic-bezier(.3,.6,.4,1)'}).onfinish=()=>c.remove();
+    }
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

@@ -3,351 +3,254 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>헤르메스 교육 교재</title>
+    <title>헤르메스 교재 — 통합 허브</title>
     <meta
       name="description"
-      content="메신저에서 부르고, 도구로 일하고, 예약으로 움직이는 AI 비서 헤르메스 교육 교재"
+      content="메신저에서 부르고, 도구로 일하고, 예약으로 움직이는 AI 비서 헤르메스 — 교육 교재·핸드북·설치·운영·멀티에이전트·텔레그램 핸즈온을 한 곳에서."
     />
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23105d58'/%3E%3Ccircle cx='32' cy='32' r='17' fill='%23f1c46a'/%3E%3Cpath d='M21 33h22M32 21v22' stroke='%23fffdf9' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+    />
+    <style>
+      :root {
+        --bg: #fbf9f4;
+        --surface: #ffffff;
+        --surface-2: #f4f1ea;
+        --ink: #1d2630;
+        --ink-soft: #51606e;
+        --line: #e7e2d7;
+        --teal: #089aa2;
+        --teal-deep: #105d58;
+        --coral: #ef674f;
+        --gold: #f1c46a;
+        --navy: #0f2330;
+        --radius: 16px;
+        --shadow: 0 10px 30px rgba(16, 45, 50, 0.08);
+        --maxw: 1120px;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
+          "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: var(--teal-deep); text-decoration: none; }
+
+      /* ── 공통 허브 네비 ── */
+      .hubnav {
+        position: sticky; top: 0; z-index: 99999;
+        background: var(--navy); color: #f5f7f6;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+      }
+      .hubnav__in {
+        max-width: var(--maxw); margin: 0 auto; padding: 9px 20px;
+        display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      }
+      .hubnav__home {
+        display: flex; align-items: center; gap: 7px;
+        font-weight: 800; color: var(--gold); font-size: 15px; white-space: nowrap;
+      }
+      .hubnav__home:hover { color: #fff; }
+      .hubnav__links { display: flex; gap: 5px; flex-wrap: wrap; margin-left: auto; }
+      .hubnav__links a {
+        color: #cfe3e2; font-size: 13px; padding: 5px 11px;
+        border-radius: 999px; white-space: nowrap; transition: background .15s, color .15s;
+      }
+      .hubnav__links a:hover { background: rgba(255, 255, 255, 0.09); color: #fff; }
+      .hubnav__links a.is-active { background: var(--teal); color: #fff; font-weight: 700; }
+      @media (max-width: 680px) {
+        .hubnav__in { padding: 8px 14px; gap: 10px; }
+        .hubnav__links a { font-size: 12px; padding: 4px 9px; }
+      }
+
+      /* ── Hero ── */
+      .hero {
+        position: relative; overflow: hidden;
+        background: linear-gradient(135deg, #0c2b2c 0%, var(--navy) 60%, #0a1c26 100%);
+        color: #f5f7f6;
+      }
+      .hero__image {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.24; filter: saturate(1.05);
+      }
+      .hero__scrim {
+        position: absolute; inset: 0;
+        background: radial-gradient(1200px 480px at 78% -10%, rgba(8,154,162,.35), transparent 60%),
+          linear-gradient(180deg, rgba(10,28,38,.25), rgba(10,28,38,.8));
+      }
+      .hero__content {
+        position: relative; z-index: 2;
+        max-width: var(--maxw); margin: 0 auto;
+        padding: 78px 24px 70px;
+      }
+      .eyebrow {
+        text-transform: uppercase; letter-spacing: .18em; font-size: 12px;
+        font-weight: 700; color: var(--gold); margin: 0 0 14px;
+      }
+      .hero__content h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.15; margin: 0 0 16px; letter-spacing: -.01em; }
+      .hero__content .lead { font-size: clamp(15px, 2.2vw, 19px); color: #dbe7e6; max-width: 720px; margin: 0; }
+      .hero__meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 34px; }
+      .hero__meta div { display: flex; flex-direction: column; }
+      .hero__meta strong { font-size: 26px; color: #fff; }
+      .hero__meta span { font-size: 13px; color: #aac3c2; letter-spacing: .02em; }
+
+      /* ── Sections ── */
+      main { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+      .group { padding: 56px 0 8px; }
+      .group__head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+      .group__kicker {
+        text-transform: uppercase; letter-spacing: .16em; font-size: 12px;
+        font-weight: 700; color: var(--teal);
+      }
+      .group__head h2 { font-size: 22px; margin: 0; }
+      .group__head p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+
+      .card {
+        display: flex; flex-direction: column;
+        background: var(--surface); border: 1px solid var(--line);
+        border-radius: var(--radius); padding: 24px 22px;
+        box-shadow: var(--shadow); transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+        min-height: 188px;
+      }
+      .card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(16,45,50,.14); border-color: #d8d0bf; }
+      .card__tag {
+        align-self: flex-start; font-size: 11px; font-weight: 700; letter-spacing: .08em;
+        text-transform: uppercase; color: var(--teal-deep);
+        background: var(--surface-2); border: 1px solid var(--line);
+        padding: 4px 10px; border-radius: 999px; margin-bottom: 14px;
+      }
+      .card h3 { font-size: 18px; margin: 0 0 8px; color: var(--ink); }
+      .card p { margin: 0; color: var(--ink-soft); font-size: 14px; flex: 1; }
+      .card__foot { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+      .card__chip { font-size: 12px; color: var(--ink-soft); }
+      .card__go { font-size: 14px; font-weight: 700; color: var(--coral); }
+      .card:hover .card__go { color: var(--teal-deep); }
+
+      /* ── Footer ── */
+      .footer {
+        margin-top: 64px; border-top: 1px solid var(--line);
+        background: var(--surface-2);
+      }
+      .footer__in {
+        max-width: var(--maxw); margin: 0 auto; padding: 28px 24px;
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 12px; color: var(--ink-soft); font-size: 13px;
+      }
+      .footer a { color: var(--teal-deep); font-weight: 600; }
+    </style>
   </head>
   <body>
-    <header class="hero" id="top">
-      <img
-        class="hero__image"
-        src="assets/hermes-hero.png"
-        alt="헤르메스 AI 비서 교육을 표현한 생성형 일러스트"
-      />
+    <nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴">
+      <div class="hubnav__in">
+        <a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a>
+        <div class="hubnav__links">
+          <a href="curriculum.html">교육 교재</a>
+          <a href="handbook.html">완전 활용 핸드북</a>
+          <a href="install-guide.html">로컬 설치</a>
+          <a href="advanced-guide.html">운영·확장</a>
+          <a href="multiagent-guide.html">멀티 에이전트</a>
+          <a href="telegram-handson.html">텔레그램 핸즈온</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <img class="hero__image" src="assets/hermes-hero.png" alt="헤르메스 AI 비서를 표현한 일러스트" />
       <div class="hero__scrim"></div>
-      <nav class="topbar" aria-label="상단 메뉴">
-        <a class="brand" href="#top">Hermes Manual</a>
-        <div class="topbar__links">
-          <a href="#overview">개요</a>
-          <a href="#curriculum">교재</a>
-          <a href="#prompt-cards">프롬프트</a>
-        </div>
-      </nav>
-      <section class="hero__content">
+      <div class="hero__content">
         <p class="eyebrow">PolarisOS · AI 비서 교육</p>
-        <h1>헤르메스 교육 교재</h1>
-        <p class="lead">메신저에서 부르고, 도구로 일하고, 예약으로 움직이는 AI 비서 만들기 — 바이브코딩 추가 교재</p>
-        <div class="hero__actions">
-          <a class="button button--primary" href="#curriculum">교재 읽기</a>
-          <a class="button button--secondary" href="#prompt-cards">프롬프트 카드</a>
+        <h1>헤르메스 교재 통합 허브</h1>
+        <p class="lead">
+          메신저에서 부르고, 도구로 일하고, 예약으로 움직이는 AI 비서 헤르메스.
+          입문 커리큘럼부터 완전 활용 핸드북, 설치·운영·멀티에이전트, 텔레그램 핸즈온까지
+          흩어져 있던 교재를 한 곳에 모았습니다.
+        </p>
+        <div class="hero__meta">
+          <div><strong>6</strong><span>교재 모듈</span></div>
+          <div><strong>입문→심화</strong><span>학습 흐름</span></div>
+          <div><strong>실습형</strong><span>복붙 가능한 예시</span></div>
         </div>
-      </section>
+      </div>
     </header>
 
     <main>
-      <section class="summary-band" id="overview" aria-labelledby="overview-title">
-        <div class="summary-band__inner">
-          <div>
-            <p class="eyebrow">overview</p>
-            <h2 id="overview-title">처음 쓰는 사람도 따라갈 수 있는 실습형 구성</h2>
-            <p>
-              개념 설명, 설치 준비, 첫 대화, 예약 자동화, 이메일/웹 요약, 멀티 에이전트 운영까지
-              한 번의 흐름으로 읽을 수 있게 정리한 실습형 교재입니다.
-            </p>
-          </div>
-          <div class="metric-grid" aria-label="교재 구성 요약">
-            <div>
-              <strong>5</strong>
-              <span>학습 파트</span>
-            </div>
-            <div>
-              <strong>11</strong>
-              <span>챕터</span>
-            </div>
-            <div>
-              <strong>8</strong>
-              <span>복사 가능한 예시</span>
-            </div>
-          </div>
+      <section class="group">
+        <div class="group__head">
+          <span class="group__kicker">start here</span>
+          <h2>기초 · 시작하기</h2>
+          <p>처음이라면 여기서부터 — 개념을 잡고, 설치하고, 텔레그램으로 첫 대화를 나눕니다.</p>
+        </div>
+        <div class="cards">
+          <a class="card" href="curriculum.html">
+            <span class="card__tag">교육 교재</span>
+            <h3>처음 만나는 헤르메스</h3>
+            <p>개념·설치 준비·첫 대화·예약 자동화·웹 요약·멀티 에이전트까지 한 흐름으로 읽는 실습형 커리큘럼.</p>
+            <div class="card__foot"><span class="card__chip">5파트 · 11챕터</span><span class="card__go">열기 →</span></div>
+          </a>
+          <a class="card" href="install-guide.html">
+            <span class="card__tag">설치</span>
+            <h3>로컬 설치와 첫 실행</h3>
+            <p>Windows·Mac·Linux 설치, 환경 설정, 첫 실행과 검증, 문제 해결·복구 절차까지.</p>
+            <div class="card__foot"><span class="card__chip">설치 가이드</span><span class="card__go">열기 →</span></div>
+          </a>
+          <a class="card" href="telegram-handson.html">
+            <span class="card__tag">핸즈온</span>
+            <h3>헤르메스 × 텔레그램</h3>
+            <p>BotFather 봇 생성부터 권한 설정, 그룹·토픽 구성, 슬래시 명령 치트시트까지 따라하기.</p>
+            <div class="card__foot"><span class="card__chip">단계별 핸즈온</span><span class="card__go">열기 →</span></div>
+          </a>
         </div>
       </section>
 
-      <section class="layout" id="curriculum">
-        <aside class="toc" aria-label="교재 목차">
-          <div class="toc__panel">
-            <p class="toc__title">목차</p>
-            <a href="#goals">목표</a>
-            <a href="#part-01">PART 01</a>
-            <a href="#part-02">PART 02</a>
-            <a href="#part-03">PART 03</a>
-            <a href="#part-04">PART 04</a>
-            <a href="#part-05">PART 05</a>
-            <a href="#prompt-cards">프롬프트 카드</a>
-          </div>
-        </aside>
-
-        <article class="content">
-          <section class="chapter" id="goals">
-            <p class="section-kicker">goals</p>
-            <h2>이 교재의 목표</h2>
-            <p>
-              이 교재는 헤르메스를 처음 접하는 사용자가 메신저 기반 AI 비서의 개념을 이해하고,
-              직접 연결하고, 반복 업무를 맡기는 데 필요한 흐름을 한 번에 익히도록 설계했습니다.
-              핵심 교육 방식은 쉽게 시작하기, 실제 업무 중심 실습, 말로 지시하기, 안전을 먼저
-              다루기입니다.
-            </p>
-            <ul class="check-list">
-              <li>대상: 코딩을 깊게 모르는 일반 사용자, 교육 운영자, 업무 자동화 입문자</li>
-              <li>학습 결과: 구조 이해, 메신저 연결, 첫 대화, 알림/브리핑 자동화, 정보 수집 실습</li>
-              <li>운영 원칙: 편리함보다 안전을 먼저 정하고 작은 자동화부터 확장</li>
-            </ul>
-          </section>
-
-
-          <section class="chapter" id="part-01">
-            <p class="part-label">PART 01</p>
-            <h2>처음 만나는 헤르메스</h2>
-            <h3>Chapter 01. 헤르메스는 무엇인가</h3>
-            <p>
-              헤르메스는 채팅창 안에만 머무르는 챗봇이 아니라, 사용자의 컴퓨터와 연결된 AI 작업
-              비서입니다. 사용자는 익숙한 메신저에서 말을 걸고, 헤르메스는 게이트웨이를 통해
-              요청을 받은 뒤 필요한 도구를 사용해 일을 처리합니다.
-            </p>
-            <figure class="diagram-figure">
-              <img
-                src="assets/hermes-architecture.png"
-                alt="헤르메스 아키텍처 개념 — 메신저 채널에서 게이트웨이를 거쳐 AI 에이전트가 도구를 사용하는 구조"
-              />
-              <figcaption>헤르메스 아키텍처 개념 — 메신저 채널 → 게이트웨이 → AI 에이전트 → 도구</figcaption>
-            </figure>
-            <div class="architecture" aria-label="헤르메스 핵심 구조 요약">
-              <div>메신저 채널</div>
-              <span></span>
-              <div>게이트웨이</div>
-              <span></span>
-              <div>AI 에이전트</div>
-              <span></span>
-              <div>도구/스킬</div>
-            </div>
-            <h3>Chapter 02. 시작하기 전에 준비할 것</h3>
-            <ul class="check-list">
-              <li>항상 켜둘 컴퓨터 또는 서버를 준비한다.</li>
-              <li>터미널에서 현재 위치 확인, 폴더 이동, 목록 보기 정도는 연습한다.</li>
-              <li>AI 모델 API 키 또는 구독 계정을 준비한다.</li>
-              <li>연결할 메신저 계정을 정한다. 입문용으로는 텔레그램을 권장한다.</li>
-              <li>실습용 폴더를 따로 만들고 중요한 개인 파일과 분리한다.</li>
-            </ul>
-            <div class="note">
-              <strong>보안 원칙</strong>
-              <p>
-                API 키와 봇 토큰은 암호와 같습니다. 채팅방, 깃허브, 문서에 그대로 붙여 넣지
-                않고, 처음에는 헤르메스가 접근할 수 있는 폴더와 웹사이트를 좁게 제한하세요.
-              </p>
-            </div>
-          </section>
-
-          <section class="chapter" id="part-02">
-            <p class="part-label">PART 02</p>
-            <h2>헤르메스 설치와 첫 대화</h2>
-            <h3>Chapter 03. 게이트웨이 실행하기</h3>
-            <p>
-              게이트웨이는 헤르메스의 출입문입니다. 사용자의 메시지, 예약 작업, 외부 도구 요청이
-              모두 이곳을 통과합니다.
-            </p>
-            <pre><code>hermes gateway run --port 18789
-[Hermes Gateway] Starting...
-[Agent] Ready
-[Gateway] Listening on port 18789</code></pre>
-            <h3>Chapter 04. 텔레그램 봇 연결하기</h3>
-            <ol class="step-list">
-              <li>텔레그램에서 BotFather를 검색하고 대화를 시작합니다.</li>
-              <li><code>/newbot</code>을 입력하고 봇 이름과 사용자명을 정합니다.</li>
-              <li>발급된 토큰을 안전한 비밀 저장소에 보관합니다.</li>
-              <li>헤르메스 설정에 토큰을 등록합니다.</li>
-              <li>봇 대화창에서 짧게 인사해 응답을 확인합니다.</li>
-            </ol>
-            <div class="prompt-card">
-              <button type="button" data-copy="안녕, 나는 준이고 너는 내 업무 비서 헤르메스야. 앞으로 나를 도와 일정 정리, 이메일 요약, 자료 조사, 알림 설정을 해줘. 먼저 네가 할 수 있는 일을 짧게 소개해줘.">복사</button>
-              <p>안녕, 나는 준이고 너는 내 업무 비서 헤르메스야. 앞으로 나를 도와 일정 정리, 이메일 요약, 자료 조사, 알림 설정을 해줘. 먼저 네가 할 수 있는 일을 짧게 소개해줘.</p>
-            </div>
-          </section>
-
-          <section class="chapter" id="part-03">
-            <p class="part-label">PART 03</p>
-            <h2>말로 시키는 자동화</h2>
-            <h3>Chapter 05. 20분 뒤 알림 만들기</h3>
-            <p>가장 작은 자동화는 일회성 알림입니다. 사용자는 명령어를 외울 필요 없이 자연어로 말하면 됩니다.</p>
-            <div class="prompt-card">
-              <button type="button" data-copy="20분 뒤에 ‘회의실 예약 확인하기’라고 알려줘.">복사</button>
-              <p>20분 뒤에 ‘회의실 예약 확인하기’라고 알려줘.</p>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>구분</th>
-                    <th>언제 쓰나</th>
-                    <th>예시</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>일회성 알림</td>
-                    <td>한 번만 알려주면 되는 일</td>
-                    <td>내일 오전 10시에 병원 예약 확인</td>
-                  </tr>
-                  <tr>
-                    <td>반복 브리핑</td>
-                    <td>매일 또는 매주 반복되는 일</td>
-                    <td>평일 오전 9시에 오늘 일정 요약</td>
-                  </tr>
-                  <tr>
-                    <td>상태 감시</td>
-                    <td>문제가 생겼을 때만 알고 싶은 일</td>
-                    <td>5분마다 서버 상태 확인</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <h3>Chapter 06. 아침 브리핑 만들기</h3>
-            <p>
-              헤르메스가 비서처럼 느껴지는 순간은 사용자가 먼저 묻지 않아도 필요한 정보를 챙겨줄
-              때입니다. 아침 브리핑은 날씨, 일정, 할 일, 중요한 이메일을 한 번에 묶는 대표
-              실습입니다.
-            </p>
-            <div class="prompt-card">
-              <button type="button" data-copy="매일 평일 오전 8시에 오늘 날씨, 캘린더 일정, 중요한 이메일, 오늘 해야 할 일을 5줄 이내로 브리핑해줘.">복사</button>
-              <p>매일 평일 오전 8시에 오늘 날씨, 캘린더 일정, 중요한 이메일, 오늘 해야 할 일을 5줄 이내로 브리핑해줘.</p>
-            </div>
-
-            <h3>Chapter 07. 이메일 연결과 앱 비밀번호</h3>
-            <p>
-              이메일 자동화는 강력하지만 민감합니다. 개인 계정 비밀번호를 그대로 쓰지 말고,
-              가능하면 앱 비밀번호나 별도 토큰을 사용하세요.
-            </p>
-            <pre><code>hermes skill install email
-hermes secret set gmail_app_password
-hermes email connect --account [REDACTED_EMAIL]</code></pre>
-
-            <h3>Chapter 08. 크론 잡 관리하기</h3>
-            <figure class="diagram-figure diagram-figure--wide">
-              <img
-                src="assets/hermes-cron.png"
-                alt="자동 실행 Cron 개념 — 정해진 시간이 되면 헤르메스가 작업을 자동 실행"
-              />
-              <figcaption>자동 실행(Cron) 개념 — 정해진 시간이 되면 헤르메스가 작업을 자동 실행</figcaption>
-            </figure>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>하고 싶은 것</th>
-                    <th>이렇게 말하세요</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>목록 보기</td>
-                    <td>예약된 작업 목록 보여줘.</td>
-                  </tr>
-                  <tr>
-                    <td>시간 변경</td>
-                    <td>아침 브리핑 시간을 9시로 바꿔줘.</td>
-                  </tr>
-                  <tr>
-                    <td>잠시 중지</td>
-                    <td>이메일 체크 작업 잠시 꺼줘.</td>
-                  </tr>
-                  <tr>
-                    <td>다시 켜기</td>
-                    <td>이메일 체크 다시 켜줘.</td>
-                  </tr>
-                  <tr>
-                    <td>삭제</td>
-                    <td>쓸모없는 테스트 알림 삭제해줘.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="chapter" id="part-04">
-            <p class="part-label">PART 04</p>
-            <h2>정보 수집과 웹 요약</h2>
-            <p>
-              헤르메스는 웹페이지를 열어 내용을 읽고 핵심을 요약할 수 있습니다. 단, 불필요하게
-              자주 접속하거나 대량으로 긁어오는 방식은 피해야 합니다.
-            </p>
-            <div class="prompt-card">
-              <button type="button" data-copy="웹페이지 내용을 읽고 핵심만 요약해줘. 제목, 핵심 이슈 5개, 내가 확인해야 할 행동 3개로 정리해줘: https://example.com">복사</button>
-              <p>웹페이지 내용을 읽고 핵심만 요약해줘. 제목, 핵심 이슈 5개, 내가 확인해야 할 행동 3개로 정리해줘: https://example.com</p>
-            </div>
-            <ul class="check-list">
-              <li>같은 페이지를 초 단위로 반복 새로고침하지 않습니다.</li>
-              <li>한 번에 수백 페이지를 수집하지 않습니다.</li>
-              <li>서비스 약관과 robots.txt를 확인합니다.</li>
-              <li>출처와 날짜를 요약에 함께 남깁니다.</li>
-            </ul>
-          </section>
-
-          <section class="chapter" id="part-05">
-            <p class="part-label">PART 05</p>
-            <h2>여러 에이전트로 확장하기</h2>
-            <p>
-              한 명의 AI가 모든 일을 처리할 수도 있지만, 업무가 커지면 역할을 나누는 편이 안전하고
-              명확합니다. 게이트웨이는 요청의 성격을 보고 알맞은 전문 에이전트로 보내는 라우터
-              역할을 할 수 있습니다.
-            </p>
-            <div class="role-grid">
-              <div>
-                <strong>일상 비서</strong>
-                <span>일정, 알림, 간단 정리</span>
-              </div>
-              <div>
-                <strong>리서치 에이전트</strong>
-                <span>웹 조사, 출처 정리</span>
-              </div>
-              <div>
-                <strong>문서 에이전트</strong>
-                <span>교재, 보고서, 발표자료 초안</span>
-              </div>
-              <div>
-                <strong>개발 에이전트</strong>
-                <span>코드, 터미널, 자동화</span>
-              </div>
-            </div>
-          </section>
-
-          <section class="chapter" id="prompt-cards">
-            <p class="section-kicker">appendix</p>
-            <h2>실습용 프롬프트 카드</h2>
-            <div class="cards">
-              <article class="mini-card">
-                <span>첫 인사</span>
-                <p>너는 내 업무 비서 헤르메스야. 앞으로 어떤 일을 도와줄 수 있는지 짧게 알려줘.</p>
-              </article>
-              <article class="mini-card">
-                <span>설정 정리</span>
-                <p>나중에 다시 설치할 수 있게 지금 설정 과정을 단계별로 정리해줘.</p>
-              </article>
-              <article class="mini-card">
-                <span>이메일</span>
-                <p>최근 중요한 메일만 골라 제목, 보낸 사람, 내가 할 일을 표로 정리해줘.</p>
-              </article>
-              <article class="mini-card">
-                <span>작업 점검</span>
-                <p>예약된 작업 목록과 최근 실패한 작업이 있는지 확인해줘.</p>
-              </article>
-            </div>
-          </section>
-
-        </article>
+      <section class="group">
+        <div class="group__head">
+          <span class="group__kicker">go deeper</span>
+          <h2>심화 · 운영</h2>
+          <p>실제로 부려 쓰기 시작했다면 — 메모리·크론·모델 라우팅, 안정 운영, 여러 에이전트로 확장.</p>
+        </div>
+        <div class="cards">
+          <a class="card" href="handbook.html">
+            <span class="card__tag">핸드북</span>
+            <h3>완전 활용 핸드북</h3>
+            <p>마케팅 vs 실제 검증, 메모리 구조, 옵시디언 연동, 크론, 모델 라우팅, 메신저·이메일·MCP, 트러블슈팅.</p>
+            <div class="card__foot"><span class="card__chip">14챕터</span><span class="card__go">열기 →</span></div>
+          </a>
+          <a class="card" href="advanced-guide.html">
+            <span class="card__tag">운영</span>
+            <h3>운영·확장 가이드</h3>
+            <p>안정적으로 굴리기 — 백그라운드 실행, 확장 패턴, 운영 중 주의점과 점검 체크리스트.</p>
+            <div class="card__foot"><span class="card__chip">운영 가이드</span><span class="card__go">열기 →</span></div>
+          </a>
+          <a class="card" href="multiagent-guide.html">
+            <span class="card__tag">멀티 에이전트</span>
+            <h3>멀티 에이전트 운영</h3>
+            <p>역할을 나눠 안전하게 — 게이트웨이 라우팅으로 일상·리서치·문서·개발 에이전트를 분리 운영.</p>
+            <div class="card__foot"><span class="card__chip">멀티 에이전트</span><span class="card__go">열기 →</span></div>
+          </a>
+        </div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>헤르메스 교육 교재 · PolarisOS 스타일 · 바이브코딩 추가 교재용</p>
-      <a href="#top">맨 위로 ↑</a>
+      <div class="footer__in">
+        <span>헤르메스 교재 통합 허브 · PolarisOS · 바이브코딩 추가 교재</span>
+        <a href="https://github.com/ninestonelee/hermes-training-manual" target="_blank" rel="noopener">GitHub 저장소 ↗</a>
+      </div>
     </footer>
-
-    <script src="script.js"></script>
   </body>
 </html>

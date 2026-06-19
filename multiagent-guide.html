@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes 매뉴얼 사이트 | 멀티 에이전트 운영</title>
+  <link rel="stylesheet" href="assets/hermes-manual.css">
+</head>
+<body>
+
+<style>
+.hubnav{position:sticky;top:0;z-index:99999;background:#0f2330;color:#f5f7f6;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.18);font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.hubnav *{box-sizing:border-box}
+.hubnav__in{max-width:1120px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hubnav__home{display:flex;align-items:center;gap:7px;font-weight:800;color:#f1c46a;text-decoration:none;font-size:15px;white-space:nowrap}
+.hubnav__home:hover{color:#fff}
+.hubnav__links{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.hubnav__links a{color:#cfe3e2;text-decoration:none;font-size:13px;padding:5px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s;line-height:1.4}
+.hubnav__links a:hover{background:rgba(255,255,255,.09);color:#fff}
+.hubnav__links a.is-active{background:#089aa2;color:#fff;font-weight:700}
+@media(max-width:680px){.hubnav__in{padding:8px 14px;gap:10px}.hubnav__links a{font-size:12px;padding:4px 9px}}
+</style>
+<nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴"><div class="hubnav__in"><a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a><div class="hubnav__links"><a href="curriculum.html">교육 교재</a><a href="handbook.html">완전 활용 핸드북</a><a href="install-guide.html">로컬 설치</a><a href="advanced-guide.html">운영·확장</a><a href="multiagent-guide.html" class="is-active">멀티 에이전트</a><a href="telegram-handson.html">텔레그램 핸즈온</a></div></div></nav>
+
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div class="progress" data-progress aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="global-nav" aria-label="Hermes 매뉴얼 사이트">
+      <a class="site-title" href="hermes-install-guide.html"><span>H</span>Hermes Manual</a>
+      <ul>
+        <li><a href="hermes-install-guide.html">로컬 설치</a></li>
+        <li><a href="hermes-advanced-guide.html">운영·확장</a></li>
+        <li><a href="hermes-multiagent-guide.html" aria-current="page">멀티 에이전트</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="toc" aria-label="이 문서 목차">
+      <h2>문서 목차</h2>
+      <ol>
+        <li><a href="#prerequisites"><span class="n">01</span><span>사전조건</span></a></li>
+        <li><a href="#install"><span class="n">02</span><span>설치</span></a></li>
+        <li><a href="#configure"><span class="n">03</span><span>설정</span></a></li>
+        <li><a href="#run"><span class="n">04</span><span>실행</span></a></li>
+        <li><a href="#verify"><span class="n">05</span><span>검증</span></a></li>
+        <li><a href="#troubleshoot"><span class="n">06</span><span>장애 대응</span></a></li>
+        <li><a href="#recover"><span class="n">07</span><span>복구</span></a></li>
+        <li><a href="#checklist"><span class="n">08</span><span>수동 검증 체크리스트</span></a></li>
+        <li><a href="#references"><span class="n">09</span><span>참고 링크</span></a></li>
+      </ol>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <article class="doc">
+        <header class="hero">
+          <p class="eyebrow">멀티 에이전트 절차</p>
+          <h1>Discord 작업실과 리뷰 에이전트 운영</h1>
+          <p class="lede">Discord 채널과 스레드를 작업 단위로 사용하고, 구현 담당과 리뷰 담당 에이전트를 분리해 협업시키는 운영 매뉴얼입니다.</p>
+          <div class="meta" aria-label="문서 요약">
+            <div><strong>대상</strong>메시징 gateway를 운영할 사용자</div>
+            <div><strong>환경</strong>Discord, Hermes gateway, 프로필</div>
+            <div><strong>결과</strong>채널·스레드 기반 협업 운영</div>
+          </div>
+        </header>
+
+        <details class="mobile-toc">
+          <summary>문서 목차 펼치기</summary>
+          <nav aria-label="모바일 문서 목차">
+            <a href="#prerequisites">01 사전조건</a>
+            <a href="#install">02 설치</a>
+            <a href="#configure">03 설정</a>
+            <a href="#run">04 실행</a>
+            <a href="#verify">05 검증</a>
+            <a href="#troubleshoot">06 장애 대응</a>
+            <a href="#recover">07 복구</a>
+            <a href="#checklist">08 수동 검증 체크리스트</a>
+            <a href="#references">09 참고 링크</a>
+          </nav>
+        </details>
+
+        <section id="prerequisites" aria-labelledby="prerequisites-title">
+          <h2 id="prerequisites-title">1. 사전조건</h2>
+          <p>멀티 에이전트 운영은 설치보다 운영 규칙이 중요합니다. 처음부터 많은 봇을 만들기보다 한 채널, 한 구현 봇, 한 리뷰 봇으로 검증합니다.</p>
+          <ul>
+            <li><strong>Hermes 기본 운영 완료</strong>: 로컬 또는 VPS에서 <code>hermes</code>와 gateway가 정상 동작해야 합니다.</li>
+            <li><strong>Discord 서버 권한</strong>: 애플리케이션을 만들고 봇을 초대할 수 있는 권한이 필요합니다.</li>
+            <li><strong>사용자 ID 확인</strong>: Discord 개발자 모드를 켜고 본인 User ID를 복사할 수 있어야 합니다.</li>
+            <li><strong>채널 규칙</strong>: 채널은 프로젝트, 스레드는 작업 단위로 사용합니다.</li>
+            <li><strong>권한 제한</strong>: 허용 사용자, 역할, 채널을 제한하고 봇 토큰은 절대 공개하지 않습니다.</li>
+          </ul>
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p>Telegram은 빠른 리모컨에 가깝고 Discord는 프로젝트 작업실에 가깝습니다. 여러 작업을 병렬로 굴릴수록 채널과 스레드 분리가 중요해집니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="install" aria-labelledby="install-title">
+          <h2 id="install-title">2. 설치</h2>
+          <p>Discord 연동은 Discord 애플리케이션 생성, 봇 초대, Hermes gateway 연결 순서로 진행합니다.</p>
+
+          <ol class="procedure">
+            <li><strong>Discord 애플리케이션을 만듭니다.</strong> Developer Portal에서 새 애플리케이션을 만들고 Application ID를 기록합니다.</li>
+            <li><strong>봇 사용자를 만듭니다.</strong> Bot 탭에서 봇 이름과 아바타를 지정합니다. Discord 제공 초대 링크를 쓰려면 Public Bot을 켭니다.</li>
+            <li><strong>Privileged Gateway Intents를 켭니다.</strong> Message Content Intent와 Server Members Intent를 켜고 저장합니다.</li>
+            <li><strong>봇 토큰을 발급합니다.</strong> 토큰은 한 번만 표시되므로 안전한 비밀 저장소에 보관합니다.</li>
+            <li><strong>서버에 초대합니다.</strong> <code>bot</code>과 <code>applications.commands</code> scope를 사용하고 필요한 권한을 부여합니다.</li>
+            <li><strong>Hermes gateway 설정을 실행합니다.</strong> 터미널에서 gateway setup을 실행하고 Discord를 선택합니다.</li>
+          </ol>
+
+          <div class="code">
+            <div class="code-head"><span>Gateway 설정</span><button class="copy" type="button" aria-label="Discord gateway 설정 명령 복사">복사</button></div>
+            <pre><code>hermes gateway setup
+hermes gateway status</code></pre>
+          </div>
+
+          <div class="callout warn">
+            <div class="icon" aria-hidden="true">!</div>
+            <div>
+              <p>Message Content Intent가 꺼져 있으면 봇이 온라인이어도 메시지 내용을 읽지 못합니다. 개인 서버라면 privileged intent 검증 이슈가 거의 없지만, 봇이 100개 이상 서버에 들어가는 경우 Discord 검증이 필요할 수 있습니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="configure" aria-labelledby="configure-title">
+          <h2 id="configure-title">3. 설정</h2>
+          <p>설정 목표는 “허가된 사람만”, “필요한 채널에서만”, “불렸을 때만” 반응하게 만드는 것입니다.</p>
+
+          <h3>권한과 사용자 제한</h3>
+          <ul>
+            <li>허용 사용자 목록에는 본인 User ID를 넣습니다.</li>
+            <li>팀 운영 시에는 역할 기반 허용을 쓰되 역할 범위를 좁힙니다.</li>
+            <li>봇이 볼 수 있는 채널을 서버 권한에서 제한합니다.</li>
+            <li>토큰을 재발급했다면 Hermes gateway 설정도 즉시 갱신합니다.</li>
+          </ul>
+
+          <h3>여러 봇이 말싸움하지 않게 하기</h3>
+          <p>두 번째 에이전트는 리뷰 담당으로 두고, 채널의 모든 메시지에 자동 반응하지 않게 설정합니다. 구현 봇이 리뷰어를 멘션할 때만 리뷰어가 끼어드는 구조가 안정적입니다.</p>
+          <div class="code">
+            <div class="code-head"><span>리뷰어 봇 설정 방향</span><button class="copy" type="button" aria-label="리뷰어 봇 설정 방향 복사">복사</button></div>
+            <pre><code>discord:
+  require_mention: true
+  thread_require_mention: true
+  history_backfill: true</code></pre>
+          </div>
+
+          <h3>이종 브리지와 ACP는 고급 옵션</h3>
+          <p>영상에서 다룬 “Codex 구현 + Claude 리뷰” 같은 이종 조합은 매력적이지만, 현재 Hermes 버전에서 해당 provider와 adapter가 실제로 제공되는지 먼저 확인해야 합니다. 공식 provider 목록과 <code>hermes --help</code>, <code>hermes model</code>에 나타나는 항목을 기준으로만 운영에 반영합니다.</p>
+          <div class="callout warn">
+            <div class="icon" aria-hidden="true">!</div>
+            <div>
+              <p>Claude 계열은 구독 포함량과 API 키 과금 조건이 구분됩니다. 외부 Claude를 붙이는 구성은 비용과 인증 제약을 먼저 확인한 뒤 테스트 채널에서만 검증하세요.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="run" aria-labelledby="run-title">
+          <h2 id="run-title">4. 실행</h2>
+          <p>운영 모델은 단순합니다. 사람은 작업 목표를 던지고, 구현 봇은 계획과 패치를 만들며, 리뷰 봇은 근거를 들어 검증합니다.</p>
+
+          <div class="cards">
+            <div class="card">
+              <h3>채널은 프로젝트</h3>
+              <p>프로젝트별로 채널을 분리합니다. 제품, 운영, 리서치, 영상 제작처럼 맥락이 다른 일을 한 채널에 섞지 않습니다.</p>
+            </div>
+            <div class="card">
+              <h3>스레드는 작업</h3>
+              <p>새 작업은 새 스레드에서 시작합니다. 완료 후에는 요약을 남기고 보관하거나 삭제합니다.</p>
+            </div>
+          </div>
+
+          <h3>상호 리뷰 작업 프롬프트</h3>
+          <div class="code">
+            <div class="code-head"><span>협업 요청 예시</span><button class="copy" type="button" aria-label="협업 요청 예시 복사">복사</button></div>
+            <pre><code>이 작업을 구현해줘. 먼저 계획을 세운 뒤 리뷰어를 멘션해서 검토를 받아.
+리뷰 피드백은 항목별로 동의, 부분 동의, 비동의로 나누고,
+쟁점이 정리된 뒤에만 구현을 시작해줘.
+완료 후 변경 요약, 검증 결과, 남은 위험을 보고해줘.</code></pre>
+          </div>
+
+          <h3>비판적 수용 규칙</h3>
+          <p>리뷰어가 항상 맞는 것은 아닙니다. 구현 봇에게 피드백을 그대로 받아들이지 말고 목표, 제약, UX, 유지보수 리스크 기준으로 검토하게 합니다.</p>
+          <div class="code">
+            <div class="code-head"><span>리뷰 처리 규칙</span><button class="copy" type="button" aria-label="리뷰 처리 규칙 복사">복사</button></div>
+            <pre><code>리뷰어 피드백을 항목별로 나눠라.
+각 항목은 동의, 부분 동의, 비동의로 판단하라.
+비동의 항목은 근거를 쓰고 다시 리뷰어와 합의하라.
+합의된 항목만 구현 계획에 반영하라.</code></pre>
+          </div>
+        </section>
+
+        <section id="verify" aria-labelledby="verify-title">
+          <h2 id="verify-title">5. 검증</h2>
+          <p>멀티 에이전트는 “봇이 답한다”만으로 충분하지 않습니다. 권한, 멘션, 스레드, 컨텍스트 분리가 같이 확인되어야 합니다.</p>
+          <ol class="procedure">
+            <li><strong>단일 봇 응답 확인</strong>허용된 사용자로 메시지를 보내고 응답을 확인합니다.</li>
+            <li><strong>비허용 사용자 차단 확인</strong>허용 목록 밖 계정 또는 역할이 무시되는지 확인합니다.</li>
+            <li><strong>스레드 응답 확인</strong>새 스레드에서 봇이 읽고 답하는지 확인합니다.</li>
+            <li><strong>리뷰어 멘션 확인</strong>리뷰어가 멘션될 때만 반응하고 일반 메시지에는 끼어들지 않는지 확인합니다.</li>
+            <li><strong>컨텍스트 점검</strong>장기 작업 전후로 세션 크기와 요약 상태를 확인합니다.</li>
+          </ol>
+          <div class="code">
+            <div class="code-head"><span>상태 점검</span><button class="copy" type="button" aria-label="멀티 에이전트 상태 점검 명령 복사">복사</button></div>
+            <pre><code>hermes gateway status
+hermes doctor</code></pre>
+          </div>
+        </section>
+
+        <section id="troubleshoot" aria-labelledby="troubleshoot-title">
+          <h2 id="troubleshoot-title">6. 장애 대응</h2>
+          <div class="table-wrap" role="region" aria-label="멀티 에이전트 장애 대응 표">
+            <table>
+              <thead>
+                <tr><th>증상</th><th>원인</th><th>대응</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>봇이 온라인인데 답하지 않음</td><td>Message Content Intent 꺼짐</td><td>Developer Portal에서 intent를 켜고 gateway를 재시작합니다.</td></tr>
+                <tr><td>Disallowed Intents 오류</td><td>코드가 요청한 intent와 Portal 설정 불일치</td><td>필요 intent를 켜거나 Hermes 설정을 줄인 뒤 재시작합니다.</td></tr>
+                <tr><td>403 Forbidden</td><td>채널 또는 봇 역할 권한 부족</td><td>View Channel, Send Messages, Read Message History 권한을 확인합니다.</td></tr>
+                <tr><td>User not allowed</td><td>허용 사용자 목록 누락</td><td>본인 User ID 또는 역할 ID를 허용 목록에 넣고 gateway를 재시작합니다.</td></tr>
+                <tr><td>여러 봇이 동시에 답함</td><td>멘션 요구 설정 누락</td><td>리뷰어 봇에 <code>require_mention</code>과 <code>thread_require_mention</code>을 적용합니다.</td></tr>
+                <tr><td>작업이 느려짐</td><td>스레드 컨텍스트 비대화</td><td>요약 문서를 만들고 새 스레드나 새 세션으로 이어갑니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="recover" aria-labelledby="recover-title">
+          <h2 id="recover-title">7. 복구</h2>
+          <p>Discord 운영 복구는 토큰, 권한, 컨텍스트, 작업 산출물을 따로 다루면 빠릅니다.</p>
+          <ol class="procedure">
+            <li><strong>토큰 유출 또는 의심</strong>Discord Developer Portal에서 토큰을 재발급하고 기존 토큰을 무효화합니다.</li>
+            <li><strong>봇 폭주</strong>gateway를 중지하고, 봇 권한 또는 서버 초대를 임시 제거합니다.</li>
+            <li><strong>설정 복구</strong>allowed users, roles, channels, mention 요구 설정을 최소값으로 되돌립니다.</li>
+            <li><strong>컨텍스트 복구</strong>현재 스레드의 목표, 결정, 남은 작업을 요약한 뒤 새 스레드에서 이어갑니다.</li>
+            <li><strong>작업물 복구</strong>코드나 문서 변경은 Git 히스토리, 백업 저장소, Hermes 세션 요약을 기준으로 되돌립니다.</li>
+          </ol>
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p>세션을 삭제하기 전에 항상 요약을 먼저 남기세요. 멀티 에이전트 운영에서 가장 비싼 손실은 토큰보다 결정 맥락입니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="checklist" aria-labelledby="checklist-title">
+          <h2 id="checklist-title">8. 수동 검증 체크리스트</h2>
+          <ul class="checklist">
+            <li>Discord Developer Portal 링크가 새 탭으로 열리고 <code>rel="noopener noreferrer"</code>를 포함한다.</li>
+            <li>Message Content Intent와 Server Members Intent 안내가 공식 문서 기준과 맞다.</li>
+            <li>봇 토큰, User ID 예시가 실제 비밀값이나 임시 토큰을 포함하지 않는다.</li>
+            <li>리뷰어 봇은 멘션될 때만 반응하도록 설명되어 있다.</li>
+            <li>키보드만으로 상단 내비게이션, 목차, 복사 버튼, 링크를 사용할 수 있다.</li>
+            <li>모바일에서 표와 코드 블록이 가로 스크롤로 읽히고 본문이 겹치지 않는다.</li>
+            <li>ACP와 이종 브리지 설명은 현재 버전 확인이 필요한 고급 옵션으로 표시되어 있다.</li>
+            <li>깨진 내부 앵커와 죽은 로컬 링크가 없다.</li>
+          </ul>
+        </section>
+
+        <section id="references" class="refs" aria-labelledby="references-title">
+          <h2 id="references-title">9. 참고 링크</h2>
+          <ul>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/discord" target="_blank" rel="noopener noreferrer">Hermes Discord Gateway</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/" target="_blank" rel="noopener noreferrer">Messaging Gateways</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/profiles" target="_blank" rel="noopener noreferrer">Profiles</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/security" target="_blank" rel="noopener noreferrer">Security Guide</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/integrations/providers" target="_blank" rel="noopener noreferrer">AI Providers</a></li>
+            <li><a href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portal</a></li>
+          </ul>
+        </section>
+
+        <footer class="site-footer">
+          <nav aria-label="이전 문서">
+            <a href="hermes-install-guide.html">로컬 설치</a>
+            <a href="hermes-advanced-guide.html">이전: 운영·확장</a>
+            <a href="#main">맨 위로</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+  </div>
+
+  <script src="assets/hermes-manual.js"></script>
+</body>
+</html>

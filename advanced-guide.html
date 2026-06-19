@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes 매뉴얼 사이트 | 운영·확장</title>
+  <link rel="stylesheet" href="assets/hermes-manual.css">
+</head>
+<body>
+
+<style>
+.hubnav{position:sticky;top:0;z-index:99999;background:#0f2330;color:#f5f7f6;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.18);font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.hubnav *{box-sizing:border-box}
+.hubnav__in{max-width:1120px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hubnav__home{display:flex;align-items:center;gap:7px;font-weight:800;color:#f1c46a;text-decoration:none;font-size:15px;white-space:nowrap}
+.hubnav__home:hover{color:#fff}
+.hubnav__links{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.hubnav__links a{color:#cfe3e2;text-decoration:none;font-size:13px;padding:5px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s;line-height:1.4}
+.hubnav__links a:hover{background:rgba(255,255,255,.09);color:#fff}
+.hubnav__links a.is-active{background:#089aa2;color:#fff;font-weight:700}
+@media(max-width:680px){.hubnav__in{padding:8px 14px;gap:10px}.hubnav__links a{font-size:12px;padding:4px 9px}}
+</style>
+<nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴"><div class="hubnav__in"><a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a><div class="hubnav__links"><a href="curriculum.html">교육 교재</a><a href="handbook.html">완전 활용 핸드북</a><a href="install-guide.html">로컬 설치</a><a href="advanced-guide.html" class="is-active">운영·확장</a><a href="multiagent-guide.html">멀티 에이전트</a><a href="telegram-handson.html">텔레그램 핸즈온</a></div></div></nav>
+
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div class="progress" data-progress aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="global-nav" aria-label="Hermes 매뉴얼 사이트">
+      <a class="site-title" href="hermes-install-guide.html"><span>H</span>Hermes Manual</a>
+      <ul>
+        <li><a href="hermes-install-guide.html">로컬 설치</a></li>
+        <li><a href="hermes-advanced-guide.html" aria-current="page">운영·확장</a></li>
+        <li><a href="hermes-multiagent-guide.html">멀티 에이전트</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="toc" aria-label="이 문서 목차">
+      <h2>문서 목차</h2>
+      <ol>
+        <li><a href="#prerequisites"><span class="n">01</span><span>사전조건</span></a></li>
+        <li><a href="#install"><span class="n">02</span><span>설치</span></a></li>
+        <li><a href="#configure"><span class="n">03</span><span>설정</span></a></li>
+        <li><a href="#run"><span class="n">04</span><span>실행</span></a></li>
+        <li><a href="#verify"><span class="n">05</span><span>검증</span></a></li>
+        <li><a href="#troubleshoot"><span class="n">06</span><span>장애 대응</span></a></li>
+        <li><a href="#recover"><span class="n">07</span><span>복구</span></a></li>
+        <li><a href="#checklist"><span class="n">08</span><span>수동 검증 체크리스트</span></a></li>
+        <li><a href="#references"><span class="n">09</span><span>참고 링크</span></a></li>
+      </ol>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <article class="doc">
+        <header class="hero">
+          <p class="eyebrow">운영·확장 절차</p>
+          <h1>VPS, 크론, 보안, 백업 운영</h1>
+          <p class="lede">로컬 설치 후 Hermes를 24시간 운영하고, API 키·크론·GitHub 백업·여러 에이전트 분리를 안전하게 다루기 위한 운영 매뉴얼입니다.</p>
+          <div class="meta" aria-label="문서 요약">
+            <div><strong>대상</strong>로컬 검증을 끝낸 사용자</div>
+            <div><strong>환경</strong>Linux VPS, SSH, systemd</div>
+            <div><strong>결과</strong>상시 실행, 백업, 복구 가능한 운영</div>
+          </div>
+        </header>
+
+        <details class="mobile-toc">
+          <summary>문서 목차 펼치기</summary>
+          <nav aria-label="모바일 문서 목차">
+            <a href="#prerequisites">01 사전조건</a>
+            <a href="#install">02 설치</a>
+            <a href="#configure">03 설정</a>
+            <a href="#run">04 실행</a>
+            <a href="#verify">05 검증</a>
+            <a href="#troubleshoot">06 장애 대응</a>
+            <a href="#recover">07 복구</a>
+            <a href="#checklist">08 수동 검증 체크리스트</a>
+            <a href="#references">09 참고 링크</a>
+          </nav>
+        </details>
+
+        <section id="prerequisites" aria-labelledby="prerequisites-title">
+          <h2 id="prerequisites-title">1. 사전조건</h2>
+          <p>운영 환경은 로컬 설치보다 권한과 비용 리스크가 큽니다. 먼저 로컬에서 Hermes 기본 대화, provider 설정, 대시보드 확인을 마친 뒤 VPS로 옮깁니다.</p>
+          <ul>
+            <li><strong>로컬 검증 완료</strong>: <code>hermes</code>, <code>hermes doctor</code>, provider 선택이 정상 동작해야 합니다.</li>
+            <li><strong>VPS 접속 정보</strong>: Ubuntu 계열 Linux, SSH 접속, 방화벽을 관리할 수 있는 계정.</li>
+            <li><strong>비공개 백업 저장소</strong>: 메모리, 스킬, 운영 문서를 백업할 private GitHub 저장소.</li>
+            <li><strong>비밀키 원칙</strong>: 키는 채팅에 붙여넣지 않고 설정 파일 또는 전용 명령을 통해 저장합니다.</li>
+            <li><strong>비용 한도</strong>: provider별 월 한도, API 키 권한, 알림 설정을 먼저 정합니다.</li>
+          </ul>
+          <div class="callout warn">
+            <div class="icon" aria-hidden="true">!</div>
+            <div>
+              <p>자율 에이전트를 본인 PC보다 넓은 권한으로 운영하지 마세요. VPS, 전용 계정, 최소 권한 키를 사용해 실제 신입에게 권한을 주듯 단계적으로 열어야 합니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="install" aria-labelledby="install-title">
+          <h2 id="install-title">2. 설치</h2>
+          <p>VPS 설치는 Linux 설치 절차와 같습니다. 한 대의 에이전트만 운영하면 직접 설치가 간단하고, 여러 에이전트를 분리하려면 컨테이너를 검토합니다.</p>
+
+          <div class="cards">
+            <div class="card">
+              <h3>직접 설치</h3>
+              <p>VPS 사용자 계정에 바로 설치합니다. 처음 운영하거나 단일 에이전트만 사용할 때 가장 단순합니다.</p>
+            </div>
+            <div class="card">
+              <h3>컨테이너 분리</h3>
+              <p>역할별 에이전트를 분리할 때 적합합니다. 키, 메모리, 도구 권한을 컨테이너 단위로 나눌 수 있습니다.</p>
+            </div>
+          </div>
+
+          <ol class="procedure">
+            <li><strong>SSH로 접속합니다.</strong> VPS 제공자가 안내한 사용자 계정으로 접속합니다.</li>
+            <li><strong>공식 설치 명령을 실행합니다.</strong> Linux/macOS/WSL2와 같은 설치 명령을 사용합니다.</li>
+            <li><strong>설정 마법사를 실행합니다.</strong> provider, 모델, 도구, gateway를 순서대로 설정합니다.</li>
+            <li><strong>게이트웨이 서비스를 등록합니다.</strong> 메시징을 항상 받으려면 systemd 서비스로 띄웁니다.</li>
+          </ol>
+
+          <div class="code">
+            <div class="code-head"><span>VPS 설치</span><button class="copy" type="button" aria-label="VPS 설치 명령 복사">복사</button></div>
+            <pre><code>curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+hermes setup</code></pre>
+          </div>
+
+          <div class="code">
+            <div class="code-head"><span>게이트웨이 서비스</span><button class="copy" type="button" aria-label="게이트웨이 서비스 명령 복사">복사</button></div>
+            <pre><code>hermes gateway install
+hermes gateway status</code></pre>
+          </div>
+        </section>
+
+        <section id="configure" aria-labelledby="configure-title">
+          <h2 id="configure-title">3. 설정</h2>
+          <p>운영 설정의 핵심은 provider 비용, 비밀키 저장, 크론, 백업입니다. 모든 자동화는 “검증 가능한 작은 단위”로 쪼개 등록합니다.</p>
+
+          <h3>Provider와 API 키</h3>
+          <ul>
+            <li>provider 선택은 <code>hermes model</code>에서 수행합니다.</li>
+            <li>Anthropic은 Max extra usage 또는 API 키 과금 조건을 확인해야 합니다.</li>
+            <li>Copilot, OpenAI, Nous Portal 등은 각 provider 문서에서 현재 인증 방식을 확인합니다.</li>
+            <li>키를 입력해야 한다면 채팅창이 아니라 shell, 환경 파일, 전용 config 경로를 사용합니다.</li>
+          </ul>
+
+          <h3>크론 자동화</h3>
+          <p>크론은 자연어로 등록하되 결과물, 실행 시간대, 실패 시 알림 대상을 명확히 씁니다. 서버 시간대가 UTC일 수 있으므로 “한국 시간 기준”처럼 기준을 적습니다.</p>
+          <div class="code">
+            <div class="code-head"><span>크론 요청 예시</span><button class="copy" type="button" aria-label="크론 요청 예시 복사">복사</button></div>
+            <pre><code>매일 한국 시간 오전 7시에 AI 뉴스 5개를 요약해줘.
+출처 링크를 포함하고, 실패하면 게이트웨이 메시지로 알려줘.
+이 작업을 크론으로 등록해줘.</code></pre>
+          </div>
+
+          <h3>GitHub 백업</h3>
+          <p>메모리, 스킬, 운영 문서는 private 저장소에 백업합니다. <code>.env</code>, 토큰, 쿠키, provider credential 파일은 반드시 제외합니다.</p>
+          <div class="code">
+            <div class="code-head"><span>백업 요청 예시</span><button class="copy" type="button" aria-label="백업 요청 예시 복사">복사</button></div>
+            <pre><code>이 Hermes 운영 폴더를 private GitHub 저장소에 백업하는 절차를 만들어줘.
+.env, 토큰, 쿠키, provider credential 파일은 제외하고,
+매일 자정에 변경 요약을 커밋하도록 크론을 등록해줘.</code></pre>
+          </div>
+        </section>
+
+        <section id="run" aria-labelledby="run-title">
+          <h2 id="run-title">4. 실행</h2>
+          <p>운영 중에는 CLI, gateway, cron, 대시보드의 역할을 분리해서 사용합니다. 모든 작업을 하나의 긴 대화에 밀어 넣지 않는 것이 품질 유지의 핵심입니다.</p>
+          <div class="table-wrap" role="region" aria-label="운영 실행 명령 표">
+            <table>
+              <thead>
+                <tr><th>작업</th><th>명령 또는 위치</th><th>용도</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>대화형 CLI</td><td><code>hermes</code></td><td>깊은 작업, 디버깅, 설정 변경</td></tr>
+                <tr><td>모델 변경</td><td><code>hermes model</code></td><td>provider와 기본 모델 선택</td></tr>
+                <tr><td>게이트웨이</td><td><code>hermes gateway status</code></td><td>Telegram, Discord 등 메시징 상태 확인</td></tr>
+                <tr><td>크론</td><td><code>hermes cron</code></td><td>예약 작업 목록과 실행 상태 확인</td></tr>
+                <tr><td>대시보드</td><td><code>http://localhost:9119</code></td><td>세션, 작업, 스킬, 프로필 관리</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p>텔레그램은 빠른 지시와 알림에 좋고, CLI는 장시간 코딩과 위험한 변경 검토에 좋습니다. 둘은 같은 에이전트를 바라보지만 가시성과 제어 수준이 다릅니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="verify" aria-labelledby="verify-title">
+          <h2 id="verify-title">5. 검증</h2>
+          <p>운영 검증은 “서비스가 떠 있다”보다 넓어야 합니다. 인증, 권한, 시간대, 백업 제외 규칙까지 확인합니다.</p>
+          <ol class="procedure">
+            <li><strong>기본 진단</strong><code>hermes doctor</code>가 통과하거나 조치 가능한 안내를 보여주는지 확인합니다.</li>
+            <li><strong>게이트웨이 상태</strong><code>hermes gateway status</code>에서 서비스가 실행 중인지 확인합니다.</li>
+            <li><strong>예약 작업</strong>테스트용 짧은 크론을 하나 만들고 실행 결과가 오는지 확인합니다.</li>
+            <li><strong>백업 제외</strong>저장소에 <code>.env</code>, 토큰, credential 파일이 올라가지 않는지 확인합니다.</li>
+            <li><strong>복구 리허설</strong>새 폴더 또는 테스트 서버에서 백업 자료를 읽고 복원 절차가 이해되는지 확인합니다.</li>
+          </ol>
+          <div class="code">
+            <div class="code-head"><span>운영 검증 명령</span><button class="copy" type="button" aria-label="운영 검증 명령 복사">복사</button></div>
+            <pre><code>hermes doctor
+hermes gateway status
+hermes cron</code></pre>
+          </div>
+        </section>
+
+        <section id="troubleshoot" aria-labelledby="troubleshoot-title">
+          <h2 id="troubleshoot-title">6. 장애 대응</h2>
+          <div class="table-wrap" role="region" aria-label="운영 장애 대응 표">
+            <table>
+              <thead>
+                <tr><th>증상</th><th>우선 확인</th><th>대응</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>gateway가 메시지를 받지 못함</td><td>서비스 상태, 토큰, allowed users</td><td>gateway를 재시작하고 메시징 문서의 권한 설정을 확인합니다.</td></tr>
+                <tr><td>크론 시간이 어긋남</td><td>서버 시간대, 요청 문구</td><td>“한국 시간 기준”처럼 기준 시간대를 명시해 다시 등록합니다.</td></tr>
+                <tr><td>API 비용이 예상보다 큼</td><td>provider, 모델, 자동화 빈도</td><td>저렴한 모델로 전환하고 크론 주기와 최대 반복을 줄입니다.</td></tr>
+                <tr><td>메모리 때문에 이상 동작</td><td><code>MEMORY.md</code>, <code>USER.md</code></td><td>낡은 항목을 정리하고 변경 이유를 메모리에 반영합니다.</td></tr>
+                <tr><td>백업에 비밀이 포함됨</td><td>최근 커밋, 히스토리</td><td>즉시 키를 폐기하고 저장소 히스토리 정리 또는 새 저장소 전환을 검토합니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="recover" aria-labelledby="recover-title">
+          <h2 id="recover-title">7. 복구</h2>
+          <p>운영 복구는 “서버 재구축”, “인증 재설정”, “데이터 복원” 순서로 진행하면 혼란이 줄어듭니다.</p>
+          <ol class="procedure">
+            <li><strong>서비스를 멈춥니다.</strong> 오작동 중인 gateway와 cron을 중지해 추가 변경을 막습니다.</li>
+            <li><strong>비밀키를 보호합니다.</strong> 유출 가능성이 있으면 provider, GitHub, 메시징 토큰을 먼저 폐기합니다.</li>
+            <li><strong>새 환경을 설치합니다.</strong> 공식 설치 명령으로 새 VPS 또는 사용자 계정에 Hermes를 설치합니다.</li>
+            <li><strong>백업 자료를 복원합니다.</strong> 메모리, 스킬, 운영 문서를 가져오되 <code>.env</code>는 새 값으로 다시 만듭니다.</li>
+            <li><strong>작은 작업으로 재검증합니다.</strong> provider 응답, gateway 수신, 테스트 크론, 백업 커밋을 순서대로 확인합니다.</li>
+          </ol>
+          <div class="callout warn">
+            <div class="icon" aria-hidden="true">!</div>
+            <div>
+              <p>OpenClaw 등 다른 에이전트에서 옮길 때는 마이그레이션 명령이 현재 버전에 존재하는지 <code>hermes --help</code>로 먼저 확인하세요. 문서나 영상의 명령은 버전 차이가 날 수 있습니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="checklist" aria-labelledby="checklist-title">
+          <h2 id="checklist-title">8. 수동 검증 체크리스트</h2>
+          <ul class="checklist">
+            <li>VPS 설치 후 <code>hermes doctor</code>와 <code>hermes gateway status</code>를 확인했다.</li>
+            <li>provider별 인증과 비용 조건을 공식 문서 또는 설정 화면에서 확인했다.</li>
+            <li>API 키, 토큰, credential 파일이 채팅·문서·Git 커밋에 노출되지 않는다.</li>
+            <li>테스트 크론을 등록해 실제 실행 결과와 시간대를 확인했다.</li>
+            <li>private 백업 저장소에 <code>.env</code>와 비밀 파일이 제외되는지 확인했다.</li>
+            <li>모바일/데스크톱에서 공통 내비게이션과 문서 목차를 키보드로 사용할 수 있다.</li>
+            <li>깨진 내부 앵커와 죽은 로컬 링크가 없다.</li>
+          </ul>
+        </section>
+
+        <section id="references" class="refs" aria-labelledby="references-title">
+          <h2 id="references-title">9. 참고 링크</h2>
+          <ul>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/getting-started/installation" target="_blank" rel="noopener noreferrer">Hermes 공식 설치 문서</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/reference/cli-commands" target="_blank" rel="noopener noreferrer">CLI 명령어 레퍼런스</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/configuration" target="_blank" rel="noopener noreferrer">Configuration</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/" target="_blank" rel="noopener noreferrer">Messaging Gateways</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/integrations/providers" target="_blank" rel="noopener noreferrer">AI Providers</a></li>
+          </ul>
+        </section>
+
+        <footer class="site-footer">
+          <nav aria-label="이전과 다음 문서">
+            <a href="hermes-install-guide.html">이전: 로컬 설치</a>
+            <a href="hermes-multiagent-guide.html">다음: 멀티 에이전트</a>
+            <a href="#main">맨 위로</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+  </div>
+
+  <script src="assets/hermes-manual.js"></script>
+</body>
+</html>

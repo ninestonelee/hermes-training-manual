@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes 매뉴얼 사이트 | 로컬 설치와 첫 실행</title>
+  <link rel="stylesheet" href="assets/hermes-manual.css">
+</head>
+<body>
+
+<style>
+.hubnav{position:sticky;top:0;z-index:99999;background:#0f2330;color:#f5f7f6;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.18);font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.hubnav *{box-sizing:border-box}
+.hubnav__in{max-width:1120px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hubnav__home{display:flex;align-items:center;gap:7px;font-weight:800;color:#f1c46a;text-decoration:none;font-size:15px;white-space:nowrap}
+.hubnav__home:hover{color:#fff}
+.hubnav__links{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.hubnav__links a{color:#cfe3e2;text-decoration:none;font-size:13px;padding:5px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s;line-height:1.4}
+.hubnav__links a:hover{background:rgba(255,255,255,.09);color:#fff}
+.hubnav__links a.is-active{background:#089aa2;color:#fff;font-weight:700}
+@media(max-width:680px){.hubnav__in{padding:8px 14px;gap:10px}.hubnav__links a{font-size:12px;padding:4px 9px}}
+</style>
+<nav class="hubnav" aria-label="헤르메스 교재 통합 메뉴"><div class="hubnav__in"><a class="hubnav__home" href="index.html">⬡ 헤르메스 교재</a><div class="hubnav__links"><a href="curriculum.html">교육 교재</a><a href="handbook.html">완전 활용 핸드북</a><a href="install-guide.html" class="is-active">로컬 설치</a><a href="advanced-guide.html">운영·확장</a><a href="multiagent-guide.html">멀티 에이전트</a><a href="telegram-handson.html">텔레그램 핸즈온</a></div></div></nav>
+
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div class="progress" data-progress aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="global-nav" aria-label="Hermes 매뉴얼 사이트">
+      <a class="site-title" href="hermes-install-guide.html"><span>H</span>Hermes Manual</a>
+      <ul>
+        <li><a href="hermes-install-guide.html" aria-current="page">로컬 설치</a></li>
+        <li><a href="hermes-advanced-guide.html">운영·확장</a></li>
+        <li><a href="hermes-multiagent-guide.html">멀티 에이전트</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="toc" aria-label="이 문서 목차">
+      <h2>문서 목차</h2>
+      <ol>
+        <li><a href="#prerequisites"><span class="n">01</span><span>사전조건</span></a></li>
+        <li><a href="#install"><span class="n">02</span><span>설치</span></a></li>
+        <li><a href="#configure"><span class="n">03</span><span>설정</span></a></li>
+        <li><a href="#run"><span class="n">04</span><span>실행</span></a></li>
+        <li><a href="#verify"><span class="n">05</span><span>검증</span></a></li>
+        <li><a href="#troubleshoot"><span class="n">06</span><span>장애 대응</span></a></li>
+        <li><a href="#recover"><span class="n">07</span><span>복구</span></a></li>
+        <li><a href="#checklist"><span class="n">08</span><span>수동 검증 체크리스트</span></a></li>
+        <li><a href="#references"><span class="n">09</span><span>참고 링크</span></a></li>
+      </ol>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <article class="doc">
+        <header class="hero">
+          <p class="eyebrow">로컬 설치 절차</p>
+          <h1>Hermes Agent 설치와 첫 실행</h1>
+          <p class="lede">Windows, Mac, Linux에서 Hermes를 설치하고 첫 대화를 시작하기 위한 절차형 매뉴얼입니다. 기존 강의 핵심은 유지하되 공식 문서와 충돌하는 비용·권한 표현은 안전하게 정리했습니다.</p>
+          <div class="meta" aria-label="문서 요약">
+            <div><strong>대상</strong>처음 설치하는 사용자</div>
+            <div><strong>환경</strong>Windows native, WSL2, macOS, Linux</div>
+            <div><strong>결과</strong><code>hermes</code> 실행과 기본 검증</div>
+          </div>
+        </header>
+
+        <details class="mobile-toc">
+          <summary>문서 목차 펼치기</summary>
+          <nav aria-label="모바일 문서 목차">
+            <a href="#prerequisites">01 사전조건</a>
+            <a href="#install">02 설치</a>
+            <a href="#configure">03 설정</a>
+            <a href="#run">04 실행</a>
+            <a href="#verify">05 검증</a>
+            <a href="#troubleshoot">06 장애 대응</a>
+            <a href="#recover">07 복구</a>
+            <a href="#checklist">08 수동 검증 체크리스트</a>
+            <a href="#references">09 참고 링크</a>
+          </nav>
+        </details>
+
+        <section id="prerequisites" aria-labelledby="prerequisites-title">
+          <h2 id="prerequisites-title">1. 사전조건</h2>
+          <p>Hermes 설치 프로그램은 필요한 런타임 대부분을 자동으로 준비합니다. 사용자는 터미널, 브라우저 로그인, 모델 provider 선택지만 준비하면 됩니다.</p>
+          <ul>
+            <li><strong>Windows</strong>: PowerShell 또는 Windows Terminal. 네이티브 설치는 early beta이며, 더 안정적인 경로가 필요하면 WSL2를 사용합니다.</li>
+            <li><strong>Mac / Linux / WSL2</strong>: 기본 터미널과 네트워크 연결.</li>
+            <li><strong>브라우저 로그인</strong>: Nous Portal, OpenAI, Anthropic, Google 등 사용할 provider 계정.</li>
+            <li><strong>비밀키 관리 원칙</strong>: API 키는 채팅창이나 문서에 쓰지 않습니다. 설정 마법사나 전용 config 명령을 사용합니다.</li>
+          </ul>
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p><strong>관리자 권한은 기본값이 아닙니다.</strong> Windows 네이티브 설치는 사용자 영역에 설치되며 공식 문서 기준으로 관리자 권한이 필요하지 않습니다. 권한 오류가 날 때만 별도로 점검하세요.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="install" aria-labelledby="install-title">
+          <h2 id="install-title">2. 설치</h2>
+          <p>운영체제에 맞는 한 줄 설치 명령을 실행합니다. Windows native와 WSL2 설치는 데이터 위치가 다르므로 서로 충돌하지 않습니다.</p>
+
+          <h3>Windows native: PowerShell</h3>
+          <ol class="procedure">
+            <li><strong>PowerShell을 엽니다.</strong> 시작 메뉴에서 PowerShell 또는 Windows Terminal을 실행합니다.</li>
+            <li><strong>설치 명령을 실행합니다.</strong> 아래 명령을 붙여넣고 <kbd>Enter</kbd>를 누릅니다.</li>
+            <li><strong>새 터미널을 엽니다.</strong> 설치 후 PATH 반영을 위해 PowerShell 창을 새로 엽니다.</li>
+          </ol>
+          <div class="code">
+            <div class="code-head"><span>PowerShell</span><button class="copy" type="button" aria-label="Windows 설치 명령 복사">복사</button></div>
+            <pre><code>iex (irm https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1)</code></pre>
+          </div>
+
+          <h3>Mac, Linux, WSL2</h3>
+          <ol class="procedure">
+            <li><strong>터미널을 엽니다.</strong> macOS Terminal, zsh, bash, Linux shell 중 하나를 사용합니다.</li>
+            <li><strong>설치 명령을 실행합니다.</strong> 아래 명령은 git 기반 설치를 수행합니다.</li>
+            <li><strong>셸을 다시 로드합니다.</strong> 설치 완료 후 새 터미널을 열거나 셸 설정을 다시 읽습니다.</li>
+          </ol>
+          <div class="code">
+            <div class="code-head"><span>bash</span><button class="copy" type="button" aria-label="Mac Linux 설치 명령 복사">복사</button></div>
+            <pre><code>curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</code></pre>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="설치 프로그램이 준비하는 항목">
+            <table>
+              <thead>
+                <tr><th>항목</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>uv</code>, Python 3.11</td><td>Hermes 실행용 Python 환경을 준비합니다.</td></tr>
+                <tr><td>Node.js 22</td><td>브라우저 도구와 일부 연동 기능에 사용됩니다.</td></tr>
+                <tr><td><code>ripgrep</code>, <code>ffmpeg</code></td><td>파일 검색, 오디오·미디어 변환 관련 기능에 사용됩니다.</td></tr>
+                <tr><td>Portable Git 또는 기존 Git</td><td>Windows에서는 기존 Git이 없으면 격리된 Portable Git을 사용자 영역에 설치합니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="configure" aria-labelledby="configure-title">
+          <h2 id="configure-title">3. 설정</h2>
+          <p>설치가 끝나면 설정 마법사 또는 개별 명령으로 provider, 모델, 도구, 메시징을 설정합니다. 처음에는 간단 설정을 완료한 뒤 필요할 때만 세부 설정으로 넘어갑니다.</p>
+
+          <ol class="procedure">
+            <li><strong>전체 설정 마법사를 실행합니다.</strong> 새 터미널에서 <code>hermes setup</code>을 실행하거나 설치 직후 나타나는 안내를 따릅니다.</li>
+            <li><strong>Provider를 선택합니다.</strong> 비용과 인증 방식을 확인한 뒤 Nous Portal, OpenAI, Anthropic, Google, 로컬 모델 중 하나를 선택합니다.</li>
+            <li><strong>터미널 백엔드를 고릅니다.</strong> 입문자는 Local을 선택합니다. VPS나 SSH 백엔드는 운영·확장 문서에서 다룹니다.</li>
+            <li><strong>위험 권한을 제한합니다.</strong> sudo support 또는 관리자 권한 자동 사용은 필요할 때만 켭니다.</li>
+            <li><strong>메시징은 나중에 붙입니다.</strong> Telegram, Discord는 설치 검증 후 설정하면 장애 원인을 분리하기 쉽습니다.</li>
+          </ol>
+
+          <div class="code">
+            <div class="code-head"><span>설정 명령</span><button class="copy" type="button" aria-label="Hermes 설정 명령 복사">복사</button></div>
+            <pre><code>hermes setup
+hermes model
+hermes tools
+hermes gateway setup</code></pre>
+          </div>
+
+          <div class="callout warn">
+            <div class="icon" aria-hidden="true">!</div>
+            <div>
+              <p><strong>무료·무제한 표현을 그대로 믿지 마세요.</strong> Provider의 무료 플랜, 구독 포함량, OAuth 사용 가능 여부는 자주 바뀝니다. 실제 과금 조건은 설정 화면과 공식 provider 문서에서 확인한 뒤 선택합니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="run" aria-labelledby="run-title">
+          <h2 id="run-title">4. 실행</h2>
+          <p>설정이 끝나면 대화형 CLI를 시작합니다. 첫 실행에서는 간단한 자기소개, 작업 디렉터리 확인, 기억 파일 위치 확인 정도만 진행합니다.</p>
+          <div class="code">
+            <div class="code-head"><span>첫 실행</span><button class="copy" type="button" aria-label="Hermes 실행 명령 복사">복사</button></div>
+            <pre><code>hermes</code></pre>
+          </div>
+
+          <h3>첫 작업 예시</h3>
+          <ol class="procedure">
+            <li><strong>정체성을 부여합니다.</strong> 원하는 이름, 역할, 말투를 알려주고 SOUL 파일에 반영하도록 요청합니다.</li>
+            <li><strong>환경을 알려줍니다.</strong> 자주 쓰는 폴더, 프로젝트, 도구, 선호를 알려주면 USER와 MEMORY 파일에 정리됩니다.</li>
+            <li><strong>작은 반복 작업을 맡깁니다.</strong> 파일 정리, 뉴스 요약, 점검 목록 작성처럼 위험이 낮은 작업부터 시작합니다.</li>
+            <li><strong>웹 대시보드를 확인합니다.</strong> 스킬, 세션, 작업 상태는 브라우저에서 <code>http://localhost:9119</code>로 확인합니다.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p>설치는 시작점입니다. Hermes의 핵심 가치는 기억, 스킬, 크론, 메시징이 쌓이면서 “반복 작업을 맡기는 방식”이 안정되는 데 있습니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="verify" aria-labelledby="verify-title">
+          <h2 id="verify-title">5. 검증</h2>
+          <p>설치 직후에는 기능을 넓히기보다 기본 동작을 좁게 검증합니다.</p>
+          <ol class="procedure">
+            <li><strong>명령 인식 확인</strong><code>hermes --help</code> 또는 <code>hermes doctor</code>가 실행되는지 확인합니다.</li>
+            <li><strong>대화 확인</strong><code>hermes</code>를 실행해 짧은 질문에 응답하는지 확인합니다.</li>
+            <li><strong>Provider 확인</strong><code>hermes model</code>에서 현재 provider와 모델을 확인합니다.</li>
+            <li><strong>대시보드 확인</strong><code>http://localhost:9119</code>를 열어 화면이 표시되는지 확인합니다.</li>
+            <li><strong>경로 확인</strong>Windows는 사용자 프로필과 <code>%LOCALAPPDATA%\hermes</code>, Mac/Linux는 <code>~/.hermes</code>에 데이터가 쌓이는지 확인합니다.</li>
+          </ol>
+          <div class="code">
+            <div class="code-head"><span>진단 명령</span><button class="copy" type="button" aria-label="Hermes 진단 명령 복사">복사</button></div>
+            <pre><code>hermes doctor
+hermes model</code></pre>
+          </div>
+        </section>
+
+        <section id="troubleshoot" aria-labelledby="troubleshoot-title">
+          <h2 id="troubleshoot-title">6. 장애 대응</h2>
+          <div class="table-wrap" role="region" aria-label="설치 장애 대응 표">
+            <table>
+              <thead>
+                <tr><th>증상</th><th>대응</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>hermes</code> 명령을 찾지 못함</td><td>터미널을 새로 열고 PATH를 다시 반영합니다. Mac/Linux는 셸 설정 파일을 다시 읽습니다.</td></tr>
+                <tr><td>Windows 설치가 불안정함</td><td>네이티브가 early beta인 점을 감안해 WSL2 경로로 재설치하는 것을 검토합니다.</td></tr>
+                <tr><td>로그인 또는 캡차 실패</td><td>기본 브라우저를 바꾸거나 provider 인증을 다시 실행합니다.</td></tr>
+                <tr><td>API 키 또는 인증 오류</td><td><code>hermes model</code>로 provider를 다시 선택하고, 필요한 키는 채팅이 아니라 설정 경로로 입력합니다.</td></tr>
+                <tr><td>한글 출력이 깨짐</td><td>Windows Terminal을 사용하고, 인코딩 관련 환경 변수를 공식 문서 기준으로 점검합니다.</td></tr>
+                <tr><td>대시보드 일부 기능이 안 보임</td><td>Windows native는 embedded terminal pane 등 일부 기능 차이가 있을 수 있습니다. CLI와 기본 대시보드부터 검증합니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout tip">
+            <div class="icon" aria-hidden="true">i</div>
+            <div>
+              <p>막힌 지점에서는 에러 메시지를 그대로 복사해 진단 요청을 하세요. 단, 토큰·API 키·개인정보는 먼저 제거합니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="recover" aria-labelledby="recover-title">
+          <h2 id="recover-title">7. 복구</h2>
+          <p>복구는 “설치 파일”과 “개인 데이터”를 분리해서 생각합니다. Hermes 재설치는 쉬우며, 중요한 것은 기억, 스킬, 설정, 비밀키를 안전하게 다루는 것입니다.</p>
+          <ol class="procedure">
+            <li><strong>설정만 다시 하기</strong><code>hermes setup</code> 또는 <code>hermes model</code>로 provider와 모델을 다시 잡습니다.</li>
+            <li><strong>인증 다시 하기</strong>provider 계정의 세션이 만료되면 인증 명령을 다시 실행합니다.</li>
+            <li><strong>설치 복구</strong>PATH나 portable Git이 깨졌다면 공식 설치 명령을 다시 실행합니다. Windows portable Git 문제는 사용자 영역 Git 폴더를 정리한 뒤 재실행할 수 있습니다.</li>
+            <li><strong>비밀키 유출 대응</strong>채팅이나 문서에 키를 붙여넣었다면 즉시 발급처에서 폐기하고 새 키를 발급합니다.</li>
+            <li><strong>백업에서 복원</strong>스킬과 메모리를 GitHub 등 비공개 저장소에 백업해두었다면 새 설치 후 해당 파일을 다시 가져옵니다.</li>
+          </ol>
+        </section>
+
+        <section id="checklist" aria-labelledby="checklist-title">
+          <h2 id="checklist-title">8. 수동 검증 체크리스트</h2>
+          <ul class="checklist">
+            <li>키보드만으로 skip link, 상단 내비게이션, 목차, 복사 버튼에 접근했다.</li>
+            <li>모바일 폭에서 목차가 접히고, 본문과 코드 블록이 가로로 깨지지 않는다.</li>
+            <li>모든 외부 링크가 새 탭으로 열리고 <code>rel="noopener noreferrer"</code>를 포함한다.</li>
+            <li>브라우저 저장소 API에 의존하지 않아 sandbox iframe에서도 동작한다.</li>
+            <li>설치 명령, 실행 명령, 진단 명령을 복사해도 임시값이나 비밀키가 포함되지 않는다.</li>
+            <li>Windows native와 WSL2의 차이, early beta 경고, 관리자 권한 안내가 명확하다.</li>
+            <li>깨진 내부 앵커와 죽은 로컬 링크가 없다.</li>
+          </ul>
+        </section>
+
+        <section id="references" class="refs" aria-labelledby="references-title">
+          <h2 id="references-title">9. 참고 링크</h2>
+          <ul>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/getting-started/installation" target="_blank" rel="noopener noreferrer">Hermes 공식 설치 문서</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/windows-native" target="_blank" rel="noopener noreferrer">Windows Native Guide</a></li>
+            <li><a href="https://hermes-agent.nousresearch.com/docs/integrations/providers" target="_blank" rel="noopener noreferrer">AI Providers</a></li>
+            <li><a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener noreferrer">NousResearch/hermes-agent GitHub</a></li>
+          </ul>
+        </section>
+
+        <footer class="site-footer">
+          <nav aria-label="다음 문서">
+            <a href="hermes-advanced-guide.html">다음: 운영·확장</a>
+            <a href="hermes-multiagent-guide.html">멀티 에이전트</a>
+            <a href="#main">맨 위로</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+  </div>
+
+  <script src="assets/hermes-manual.js"></script>
+</body>
+</html>
